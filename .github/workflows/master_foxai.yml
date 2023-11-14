@@ -60,8 +60,10 @@ jobs:
         run: unzip release.zip
 
       
-          - name: 'Deploy to Azure Web App'
+               - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v2
         with:
           app-name: 'foxai'
+          slot-name: 'Production' # If you are not using slots, you can remove this line
           publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_91669A63612940B18803A446BC1AD13B }}
+
