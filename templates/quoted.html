@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Quoted
+{% endblock %}
+
+{% block main %}
+<!-- Display stock information -->
+    <div class="alert alert-info" role="alert">
+        <p>A share of {{ stock.name }} ({{ stock.symbol }}) costs {{ stock.price | usd }}.</p>
+        <p>The number of shares quoted will cost: {{ total_price }}</p>
+    </div>
+
+<!-- Button to get another quote -->
+    <a class="btn btn-dark" href="/quote">Get another quote</a>
+{% endblock %}

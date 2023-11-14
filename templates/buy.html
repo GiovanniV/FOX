@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Buy
+{% endblock %}
+
+{% block main %}
+<!-- Flash messages are handled by layout.html, so they are not included here -->
+
+<!-- Buy form -->
+    <form action="/buy" method="post" class="form-signin text-center">
+    <!-- Stock symbol input -->
+        <div class="mb-3">
+            <input autocomplete="off" autofocus class="form-control mx-auto" name="symbol" placeholder="Stock Symbol" type="text" required style="width: 150px;">
+        </div>
+    <!-- Number of shares input -->
+        <div class="mb-3">
+            <input class="form-control mx-auto" name="shares" placeholder="Number of Shares" type="number" min="1" required style="width: 150px;">
+        </div>
+    <!-- Buy button -->
+        <button class="btn btn-dark" type="submit" style="width: 150px; background-color: black;">
+            Buy
+        </button>
+    </form>
+{% endblock %}

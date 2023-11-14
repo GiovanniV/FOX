@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Error
+{% endblock %}
+
+{% block main %}
+    <div class="container mt-4">
+    <!-- Page Title -->
+        <h1 class="text-center mb-4">Error</h1>
+
+    <!-- Error Message -->
+        <div class="alert alert-danger" role="alert">
+            {{ message }}
+        </div>
+    </div>
+{% endblock %}
