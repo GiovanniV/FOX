@@ -1,43 +1,31 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Transaction History
+    Image Gallery
 {% endblock %}
 
 {% block main %}
-<!-- Transaction History Container -->
+<!-- Image Gallery Container -->
     <div class="container mt-4">
     <!-- Page Title -->
-        <h1 class="text-center mb-4">Transaction History</h1>
+        <h1 class="text-center mb-4">Image Gallery</h1>
 
-    <!-- Responsive Table -->
-        <div class="table-responsive">
-            <table class="table table-striped table-hover">
-            <!-- Table Header -->
-                <thead class="thead-dark">
-                    <tr>
-                        <th scope="col">Transaction ID</th> <!-- Unique identifier for each transaction -->
-                        <th scope="col">Symbol</th> <!-- Stock symbol -->
-                        <th scope="col">Shares</th> <!-- Number of shares traded -->
-                        <th scope="col">Price</th> <!-- Price per share (formatted as USD) -->
-                        <th scope="col">Total Value</th> <!-- Total transaction value (formatted as USD) -->
-                        <th scope="col">Date</th> <!-- Transaction date -->
-                    </tr>
-                </thead>
-            <!-- Table Body -->
-                <tbody>
-                    {% for transaction in transactions %}
-                        <tr>
-                            <td>{{ transaction.id }}</td> <!-- Unique transaction ID -->
-                            <td>{{ transaction.symbol }}</td> <!-- Stock symbol -->
-                            <td>{{ transaction.shares }}</td> <!-- Number of shares -->
-                            <td>{{ transaction.price | usd }}</td> <!-- Price per share (formatted as USD) -->
-                            <td>{{ transaction.total | usd }}</td> <!-- Total transaction value (formatted as USD) -->
-                            <td>{{ transaction.transaction_date }}</td> <!-- Transaction date -->
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div> <!-- End of Responsive Table -->
-    </div> <!-- End of Transaction History Container -->
+    <!-- Image Gallery Grid -->
+        <div class="row">
+            {% for image in images %}
+                <div class="col-md-4 mb-4">
+                    <div class="card">
+                        <img src="{{ image.url }}" class="card-img-top" alt="Generated Image">
+                        <div class="card-body">
+                            <h5 class="card-title">Image ID: {{ image.id }}</h5>
+                            <p class="card-text">Description: {{ image.description }}</p>
+                            <!-- Additional details or actions for each image can be added here -->
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <p>No images have been generated yet.</p>
+            {% endfor %}
+        </div> <!-- End of Image Gallery Grid -->
+    </div> <!-- End of Image Gallery Container -->
 {% endblock %}
