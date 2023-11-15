@@ -2,6 +2,8 @@ import requests
 from urllib.parse import quote_plus
 from functools import wraps
 from flask import render_template, redirect, session
+import openai
+
 
 
 def apology(message, code=400):
@@ -97,3 +99,36 @@ def usd(value):
         str: The formatted value as a string in USD currency format.
     """
     return f"${value:,.2f}"
+
+def generate_image(description, styles=None, dimensions=None):
+    """
+    Generate an image using the OpenAI API based on the description, styles, and dimensions.
+
+    Args:
+        description (str): The description of the image.
+        styles (str, optional): The styles to be applied to the image.
+        dimensions (str, optional): The dimensions of the image.
+
+    Returns:
+        str: URL of the generated image.
+    """
+    try:
+        openai.api_key = "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"
+
+        prompt = description
+        if styles:
+            prompt += f", {styles}"
+        if dimensions:
+            prompt += f", {dimensions}"
+
+        response = openai.Image.create(
+            model="dall-e-3",
+            prompt=prompt,
+            n=1,
+            size="1024x1024"  # Adjust as needed
+        )
+        return response.data[0]['url']  # Assuming the API returns a direct link to the image
+
+    except Exception as e:
+        print(f"Error in generate_image: {e}")
+        return None

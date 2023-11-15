@@ -1,12 +1,14 @@
 import os
 import secrets
-import sqlite3  # Import sqlite3
-
-from flask import Flask, flash, redirect, render_template, request, session
+import sqlite3
+import traceback
+import logging
+from flask import Flask, flash, redirect, render_template, request, session, jsonify, current_app as app
 from flask_session import Session
 from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, lookup, usd
+from helpers import apology, login_required, lookup, usd, generate_image
+
 
 # Configure application
 app = Flask(__name__)
@@ -129,6 +131,8 @@ import re  # Import regular expressions
 
 import traceback
 
+
+
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
@@ -189,6 +193,29 @@ def buy():
     else:
         return render_template("buy.html")
 
+from flask import jsonify  # Import jsonify for JSON responses
+
+@app.route("/generate-image", methods=["POST"])
+@login_required
+def generate_image_route():
+    try:
+        # Extract data from form
+        description = request.form.get("image_description")
+
+        # Call the generate_image function
+        image_url = generate_image(description)
+
+        if image_url:
+            # Return the image URL in a JSON response
+            return jsonify({"image_url": image_url})
+        else:
+            # Handle the error case
+            app.logger.error("Error generating image")
+            return jsonify({"error": "Error generating image"}), 500
+    except Exception as e:
+        app.logger.error(f"An unexpected error occurred: {e}")
+        traceback.print_exc()  # Print the traceback for debugging
+        return jsonify({"error": "An unexpected error occurred"}), 500
 
 @app.route("/add_cash", methods=["GET", "POST"])
 @login_required
@@ -479,6 +506,9 @@ def sell():
         conn.close()
 
         return render_template("sell.html", symbols=[stock["symbol"] for stock in symbols])
+
+
+
 
 
 # Only if your app runs with app.run(), not typically used in production
