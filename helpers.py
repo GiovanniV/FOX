@@ -113,7 +113,7 @@ def generate_image(description, styles=None, dimensions=None):
         str: URL of the generated image.
     """
     try:
-        openai.api_key = "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"
+        openai.api_key = "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"
 
         prompt = description
         if styles:

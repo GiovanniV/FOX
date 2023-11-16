@@ -7,7 +7,7 @@ name: Build and deploy Python app to Azure Web App - foxai
 on:
   push:
     branches:
-      - master
+      - main  # Align with your Azure Pipelines branch name
   workflow_dispatch:
 
 jobs:

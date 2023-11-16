@@ -18,8 +18,11 @@
                 </div>
                 <!-- Additional fields for image style, dimensions, etc. -->
                 <!-- ... -->
-                <button class="btn btn-primary mt-2" type="submit">
-                    Generate Image
+
+                <!-- Inside the form -->
+                <button class="btn btn-primary mt-2" type="submit" id="generateButton">
+                    <span id="generateText">Generate Image</span>
+                    <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </button>
             </form>
         </div>
@@ -74,6 +77,10 @@
     }
 
     function handleImageGeneration() {
+        // Show loading spinner
+        document.getElementById('loadingSpinner').classList.remove('d-none');
+        document.getElementById('generateText').innerText = 'Generating...';
+
         // Fetch the generated image URL from the API response
         fetch('/generate-image', {
             method: 'POST',
@@ -84,8 +91,18 @@
             // Update the image preview link and image URL
             document.getElementById('preview-link').href = data.image_url;
             document.getElementById('preview-img').src = data.image_url;
+
+            // Hide loading spinner after image is loaded
+            document.getElementById('loadingSpinner').classList.add('d-none');
+            document.getElementById('generateText').innerText = 'Generate Image';
         })
-        .catch(error => console.error('Error:', error));
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Hide loading spinner in case of an error
+            document.getElementById('loadingSpinner').classList.add('d-none');
+            document.getElementById('generateText').innerText = 'Generate Image';
+        });
 
         // Prevent the form from submitting
         return false;
