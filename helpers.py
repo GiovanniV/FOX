@@ -1,10 +1,12 @@
 import requests
 from urllib.parse import quote_plus
 from functools import wraps
-from flask import render_template, redirect, session
+from flask import Flask, render_template, redirect, session
 import openai
+from azure.identity import DefaultAzureCredential
+from azure.keyvault.secrets import SecretClient
 
-
+app = Flask(__name__)
 
 def apology(message, code=400):
     """
@@ -43,7 +45,6 @@ def apology(message, code=400):
 
     return render_template("apology.html", top=code, bottom=escape(message)), code
 
-
 def login_required(f):
     """
     Decorate routes to require login.
@@ -63,6 +64,31 @@ def login_required(f):
 
     return decorated_function
 
+def get_openai_api_key():
+    """
+    Retrieve the OpenAI API key from Azure Key Vault.
+
+    Returns:
+        str: The OpenAI API key.
+    """
+    # Azure Key Vault configuration
+    key_vault_url = "https://gio.vault.azure.net/"
+    secret_name = "OpenAIKey"
+
+    # Create a SecretClient using DefaultAzureCredential
+    credential = DefaultAzureCredential()
+    client = SecretClient(vault_url=key_vault_url, credential=credential)
+
+    try:
+        # Retrieve the OpenAI API key from Azure Key Vault
+        secret = client.get_secret(secret_name)
+
+        # Return the OpenAI API key as a string
+        return secret.value
+
+    except Exception as e:
+        print(f"Error while retrieving OpenAI API key from Azure Key Vault: {e}")
+        return None
 
 def lookup(symbol):
     """
@@ -86,7 +112,6 @@ def lookup(symbol):
         }
     except (requests.RequestException, ValueError, KeyError):
         return None
-
 
 def usd(value):
     """
@@ -113,22 +138,30 @@ def generate_image(description, styles=None, dimensions=None):
         str: URL of the generated image.
     """
     try:
-        openai.api_key = "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"
+        # Retrieve the OpenAI API key from Azure Key Vault
+        openai_api_key = get_openai_api_key()
 
-        prompt = description
-        if styles:
-            prompt += f", {styles}"
-        if dimensions:
-            prompt += f", {dimensions}"
+        if openai_api_key:
+            # Configure the OpenAI API key
+            openai.api_key = openai_api_key
 
-        response = openai.Image.create(
-            model="dall-e-3",
-            prompt=prompt,
-            n=1,
-            size="1024x1024"  # Adjust as needed
-        )
-        return response.data[0]['url']  # Assuming the API returns a direct link to the image
+            prompt = description
+            if styles:
+                prompt += f", {styles}"
+            if dimensions:
+                prompt += f", {dimensions}"
+
+            response = openai.Image.create(
+                model="dall-e-3",
+                prompt=prompt,
+                n=1,
+                size="1024x1024"  # Adjust as needed
+            )
+            return response.data[0]['url']  # Assuming the API returns a direct link to the image
 
     except Exception as e:
         print(f"Error in generate_image: {e}")
         return None
+
+if __name__ == "__main__":
+    app.run(debug=True)
