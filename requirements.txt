@@ -1,5 +1,4 @@
 Flask
 Flask-Session
 requests
-
-Giovanni Test 
+openai
