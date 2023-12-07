@@ -128,3 +128,46 @@ footer {
 .btn-center-lg:hover {
     background-color: #333; /* Slightly lighter black for hover effect */
 }
+
+/* Custom button styles */
+.btn-orange {
+    background-color: #FF4500; /* Orange background */
+    color: #fff; /* White text color */
+    border: none; /* Remove border */
+    cursor: pointer; /* Cursor to pointer to indicate it's clickable */
+    text-transform: uppercase; /* Optional: to make text uppercase */
+    font-size: 1em; /* Font size */
+    border-radius: 5px; /* Optional: to add rounded corners */
+}
+
+.btn-orange:hover {
+    background-color: #FF3000; /* Slightly darker orange for hover effect */
+}
+
+.btn-dark-orange {
+    background-color: #FF3000; /* Darker orange background */
+    color: #fff; /* White text color */
+    border: none; /* Remove border */
+    cursor: pointer; /* Cursor to pointer to indicate it's clickable */
+    text-transform: uppercase; /* Optional: to make text uppercase */
+    font-size: 1em; /* Font size */
+    border-radius: 5px; /* Optional: to add rounded corners */
+}
+
+.btn-dark-orange:hover {
+    background-color: #FF3000; /* Slightly darker orange for hover effect */
+}
+
+.btn-light-grey {
+    background-color: #d3d3d3; /* Light grey background */
+    color: #000; /* Black text color */
+    border: none; /* Remove border */
+    cursor: pointer; /* Cursor to pointer to indicate it's clickable */
+    text-transform: uppercase; /* Optional: to make text uppercase */
+    font-size: 1em; /* Font size */
+    border-radius: 5px; /* Optional: to add rounded corners */
+}
+
+.btn-light-grey:hover {
+    background-color: #c0c0c0; /* Slightly darker grey for hover effect */
+}

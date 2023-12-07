@@ -9,18 +9,42 @@
     <!-- Image Generation Form Section -->
     <div class="row my-4">
         <div class="col-md-6">
-            <h2>Start Generating Foxai Images</h2>
+            <h2>Start Generating FoxAI Images</h2>
             <p>Enter your requirements below to get customized images for your web projects.</p>
 
             <form id="imageForm" action="/generate-image" method="post" class="form-signin" onsubmit="return handleImageGeneration()">
                 <div class="mb-3">
-                    <textarea class="form-control" name="image_description" placeholder="Describe the image you need" rows="3" required></textarea>
+                    <label for="image_description">Image Description:</label>
+                    <textarea class="form-control" name="image_description" id="image_description" placeholder="Describe the image you need" rows="3" required></textarea>
                 </div>
-                <!-- Additional fields for image style, dimensions, etc. -->
-                <!-- ... -->
 
-                <!-- Inside the form -->
-                <button class="btn btn-primary mt-2" type="submit" id="generateButton">
+                <!-- New Fields for Image Customization -->
+                <div class="mb-3">
+                    <label for="image_style">Image Style:</label>
+                    <select class="form-control" name="image_style" id="image_style">
+                        <option value="">Select Image Style</option>
+                        <!-- Options will be added dynamically -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="image_dimensions">Image Dimensions:</label>
+                    <input type="text" class="form-control" name="image_dimensions" id="image_dimensions" placeholder="Enter dimensions (e.g., 800x600)" style="width: 100%;">
+                </div>
+                <div class="mb-3">
+                    <label for="image_format">Image Format:</label>
+                    <select class="form-control" name="image_format" id="image_format">
+                        <option value="JPEG">JPEG</option>
+                        <option value="PNG">PNG</option>
+                        <!-- More format options -->
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label for="image_quality">Image Quality:</label>
+                    <input type="range" class="form-control-range" name="image_quality" min="1" max="100" value="50" id="image_quality">
+                </div>
+
+                <!-- Updated button classes and styles -->
+                <button class="btn btn-dark-orange btn-light-orange-hover mt-2" type="submit" id="generateButton" style="width: 100%;">
                     <span id="generateText">Generate Image</span>
                     <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </button>
@@ -28,37 +52,27 @@
         </div>
 
         <!-- Image Preview Section -->
-        <div class="col-md-6">
+        <div class="col-md-6" id="imagePreviewContainer" style="display: none;">
             <div class="text-center">
                 <h2>Image Preview</h2>
-                <!-- Add a link to the generated image with the "lightbox" class -->
                 <a href="#" id="preview-link" data-lightbox="image-preview">
                     <img id="preview-img" src="#" alt="Image preview" class="img-fluid mb-3">
                 </a>
-                <div class="btn-group">
-                    <button class="btn btn-secondary" onclick="downloadImage()">Download</button>
-                    <button class="btn btn-secondary" onclick="renameImage()">Rename</button>
-                    <button class="btn btn-secondary" onclick="regenerateImage()">Regenerate</button>
+                <div class="d-grid gap-2">
+                    <button class="btn btn-dark-orange" onclick="downloadImage()" style="width: 100%;">Download</button>
+                    <button class="btn btn-light-grey" id="regenerateButton" onclick="regenerateImage()" disabled style="width: 100%;">Regenerating...</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Existing Buy Form Section -->
-    <div class="row mt-5">
+    <!-- Gallery Section -->
+    <div class="row my-4">
         <div class="col-md-12">
-            <h4 class="text-left">Stock Purchase (Existing Functionality)</h4>
-            <form action="/buy" method="post" class="form-inline justify-content-center">
-                <div class="form-group mx-2">
-                    <input autocomplete="off" class="form-control" name="symbol" placeholder="Stock Symbol" type="text" required>
-                </div>
-                <div class="form-group mx-2">
-                    <input class="form-control" name="shares" placeholder="Number of Shares" type="number" min="1" required>
-                </div>
-                <button class="btn btn-dark mx-2" type="submit">
-                    Buy
-                </button>
-            </form>
+            <h2>Generated Images Gallery</h2>
+            <div id="imageGallery" class="row">
+                <!-- Gallery images will be dynamically added here -->
+            </div>
         </div>
     </div>
 </div>
@@ -66,51 +80,146 @@
 <!-- Include Lightbox2 JS file -->
 <script src="/static/lightbox.min.js"></script>
 
+<!-- Enhanced JavaScript functions -->
 <script>
-    // JavaScript functions for image actions
-    function downloadImage() {
-        // Implement image download functionality
+    // JavaScript code for gallery section
+    function populateImageGallery(images) {
+        const galleryContainer = document.getElementById('imageGallery');
+
+        images.forEach(image => {
+            const imageTile = document.createElement('div');
+            imageTile.classList.add('col-md-4', 'mb-3');
+
+            const imageUrl = image.url; // Replace with the actual image URL from the API response
+
+            // Create an image preview
+            const imagePreview = document.createElement('img');
+            imagePreview.src = imageUrl;
+            imagePreview.classList.add('img-fluid');
+            
+            // You can add more elements here to display metadata or additional information
+
+            imageTile.appendChild(imagePreview);
+            galleryContainer.appendChild(imageTile);
+        });
     }
 
-    function renameImage() {
-        // Implement image renaming functionality
+    // Fetch and populate the gallery when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetch('/api/get-generated-images')
+            .then(response => response.json())
+            .then(images => {
+                populateImageGallery(images);
+            })
+            .catch(error => console.error('Error fetching generated images:', error));
+    });
+
+    // Define a variable to keep track of the generation status
+    var isGenerating = false;
+
+    function downloadImage() {
+        var imageUrl = document.getElementById('preview-link').getAttribute('href');
+        if (imageUrl && imageUrl !== '#') {
+            var downloadLink = document.createElement('a');
+            downloadLink.href = imageUrl;
+            downloadLink.download = 'downloadedImage.png'; // Set a filename
+            downloadLink.style.display = 'none'; // Hide the download link
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+        } else {
+            console.log('Image URL is not set.');
+        }
     }
 
     function handleImageGeneration() {
-        // Show loading spinner
+        // Check if generation is already in progress
+        if (isGenerating) {
+            return false;
+        }
+
+        // Set the generation status to true
+        isGenerating = true;
+
+        // Show the loading spinner and change text
         document.getElementById('loadingSpinner').classList.remove('d-none');
         document.getElementById('generateText').innerText = 'Generating...';
 
-        // Fetch the generated image URL from the API response
         fetch('/generate-image', {
             method: 'POST',
             body: new FormData(document.getElementById('imageForm')),
         })
         .then(response => response.json())
         .then(data => {
-            // Update the image preview link and image URL
-            document.getElementById('preview-link').href = data.image_url;
-            document.getElementById('preview-img').src = data.image_url;
+            if (data.image_url) {
+                // Show the image preview container
+                document.getElementById('imagePreviewContainer').style.display = 'block';
 
-            // Hide loading spinner after image is loaded
-            document.getElementById('loadingSpinner').classList.add('d-none');
-            document.getElementById('generateText').innerText = 'Generate Image';
+                document.getElementById('preview-link').href = data.image_url;
+                document.getElementById('preview-img').src = data.image_url;
+
+                // Enable the "Regenerate Images" button
+                document.getElementById('regenerateButton').disabled = false;
+                document.getElementById('regenerateButton').innerText = 'Regenerate Images';
+                // Reset the left button text and hide the spinner
+                document.getElementById('generateText').innerText = 'Generate Image';
+                document.getElementById('loadingSpinner').classList.add('d-none');
+            } else {
+                alert('Error generating image: ' + data.error);
+            }
+
+            // Reset the generation status
+            isGenerating = false;
         })
         .catch(error => {
             console.error('Error:', error);
-            
-            // Hide loading spinner in case of an error
-            document.getElementById('loadingSpinner').classList.add('d-none');
-            document.getElementById('generateText').innerText = 'Generate Image';
+            if (error.message.includes('lightbox')) {
+                // Handle Lightbox-specific errors here
+            } else {
+                // Handle other errors
+                alert('Error generating image: ' + error);
+            }
+
+            // Reset the generation status
+            isGenerating = false;
         });
 
-        // Prevent the form from submitting
         return false;
     }
 
-    function regenerateImage() {
-        // Submit the image generation form
-        document.getElementById('imageForm').submit();
+    function fetchImageStyles() {
+        fetch('/api/image-styles')
+            .then(response => response.json())
+            .then(styles => {
+                populateImageStylesDropdown(styles);
+            })
+            .catch(error => console.error('Error fetching image styles:', error));
     }
+
+    function populateImageStylesDropdown(styles) {
+        var select = document.getElementById('image_style');
+        select.innerHTML = '';
+        styles.forEach(style => {
+            var option = document.createElement('option');
+            option.value = style;
+            option.text = style;
+            select.appendChild(option);
+        });
+    }
+
+    function regenerateImage() {
+        // Disable the "Regenerate Images" button to prevent multiple clicks
+        document.getElementById('regenerateButton').disabled = true;
+        document.getElementById('regenerateButton').innerText = 'Regenerating...';
+
+        // Call the handleImageGeneration function to generate a new image
+        handleImageGeneration();
+    }
+
+    function validateImageDimensions() {
+        // Add validation logic here if needed
+    }
+
+    document.getElementById('image_dimensions').addEventListener('change', validateImageDimensions);
 </script>
 {% endblock %}

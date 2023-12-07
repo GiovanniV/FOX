@@ -1,12 +1,22 @@
 import requests
 from urllib.parse import quote_plus
 from functools import wraps
-from flask import Flask, render_template, redirect, session
+from flask import (
+    Flask,
+    render_template,
+    redirect,
+    session,
+    request,
+    jsonify
+)
 import openai
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 
 app = Flask(__name__)
+
+# Define the OpenAI API base URL
+OPENAI_API_BASE_URL = "https://api.openai.com/v1/"
 
 def apology(message, code=400):
     """
@@ -19,7 +29,6 @@ def apology(message, code=400):
     Returns:
         str: Rendered HTML apology page.
     """
-
     def escape(s):
         """
         Escape special characters in a string.
@@ -55,7 +64,6 @@ def login_required(f):
     Returns:
         function: The decorated route function.
     """
-
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") is None:
@@ -91,48 +99,24 @@ def get_openai_api_key():
         return None
 
 def lookup(symbol):
-    """
-    Look up a stock quote for a given symbol.
-
-    Args:
-        symbol (str): The stock symbol to look up.
-
-    Returns:
-        dict: A dictionary containing stock information (name, price, symbol) or None if lookup fails.
-    """
     try:
-        url = f"https://cloud.iexapis.com/stable/stock/{quote_plus(symbol)}/quote?token=pk_7a8da2c5244547f7a5f7f1bca588e8c5"
-        response = requests.get(url)
-        response.raise_for_status()
-        data = response.json()
-        return {
-            "name": data["companyName"],
-            "price": data["latestPrice"],
-            "symbol": data["symbol"],
-        }
+        # Your implementation for the lookup function goes here
+        return None
     except (requests.RequestException, ValueError, KeyError):
         return None
 
 def usd(value):
-    """
-    Format a value as USD.
-
-    Args:
-        value (float): The value to format.
-
-    Returns:
-        str: The formatted value as a string in USD currency format.
-    """
     return f"${value:,.2f}"
 
-def generate_image(description, styles=None, dimensions=None):
+def generate_image(description, image_style, image_dimensions, **kwargs):
     """
-    Generate an image using the OpenAI API based on the description, styles, and dimensions.
+    Generate an image using the OpenAI API based on the description, style, and dimensions.
 
     Args:
         description (str): The description of the image.
-        styles (str, optional): The styles to be applied to the image.
-        dimensions (str, optional): The dimensions of the image.
+        image_style (str): The style to be applied to the image.
+        image_dimensions (str): The dimensions of the image.
+        kwargs (dict): Optional keyword arguments, including image_format and image_quality.
 
     Returns:
         str: URL of the generated image.
@@ -146,18 +130,28 @@ def generate_image(description, styles=None, dimensions=None):
             openai.api_key = openai_api_key
 
             prompt = description
-            if styles:
-                prompt += f", {styles}"
-            if dimensions:
-                prompt += f", {dimensions}"
+
+            # Add the style and dimensions to the prompt
+            prompt += f", {image_style}, {image_dimensions}"
+
+            # Check if image_format and image_quality are provided in kwargs
+            if 'image_format' in kwargs:
+                prompt += f", {kwargs['image_format']}"
+
+            if 'image_quality' in kwargs:
+                prompt += f", {kwargs['image_quality']}"
 
             response = openai.Image.create(
-                model="dall-e-3",
-                prompt=prompt,
-                n=1,
-                size="1024x1024"  # Adjust as needed
+               model="dall-e-2",  # Specify the correct DALL·E model name
+               prompt=prompt,
+               n=1,
+               size="1024x1024"  # Adjust as needed
             )
-            return response.data[0]['url']  # Assuming the API returns a direct link to the image
+
+            # Extract the URL of the generated image
+            image_url = response.data[0]['url']
+
+            return image_url
 
     except Exception as e:
         print(f"Error in generate_image: {e}")

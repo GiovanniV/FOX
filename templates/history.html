@@ -1,31 +1,23 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Image Gallery
+    Images Generated
 {% endblock %}
 
-{% block main %}
-<!-- Image Gallery Container -->
-    <div class="container mt-4">
-    <!-- Page Title -->
-        <h1 class="text-center mb-4">Image Gallery</h1>
+{% block content %}
+    <h1>Images Generated</h1>
 
-    <!-- Image Gallery Grid -->
-        <div class="row">
-            {% for image in images %}
-                <div class="col-md-4 mb-4">
-                    <div class="card">
-                        <img src="{{ image.url }}" class="card-img-top" alt="Generated Image">
-                        <div class="card-body">
-                            <h5 class="card-title">Image ID: {{ image.id }}</h5>
-                            <p class="card-text">Description: {{ image.description }}</p>
-                            <!-- Additional details or actions for each image can be added here -->
-                        </div>
-                    </div>
-                </div>
-            {% else %}
-                <p>No images have been generated yet.</p>
-            {% endfor %}
-        </div> <!-- End of Image Gallery Grid -->
-    </div> <!-- End of Image Gallery Container -->
+    <!-- Gallery of Images -->
+    <div class="image-gallery">
+        {% for transaction in transactions %}
+            <div class="image-card">
+                <a href="{{ transaction.image_url }}" target="_blank">
+                    <img src="{{ transaction.image_url }}" alt="Image">
+                </a>
+                <a href="{{ transaction.image_url }}" download="{{ transaction.filename }}">
+                    <button class="btn btn-primary">Download</button>
+                </a>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock %}

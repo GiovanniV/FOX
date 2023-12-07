@@ -1,41 +1,81 @@
-<!-- register.html -->
 {% extends "layout.html" %}
 
+{% block title %}
+    Register - FoxAI Image Generator
+{% endblock %}
+
 {% block main %}
-    <div class="container text-center">
-        <h1 class="text-center">Register</h1>
-
-    <!-- Display error message if it exists -->
-        {% if error %}
-            <div class="alert alert-danger" role="alert">
-                {{ error }}
-            </div>
-        {% endif %}
-
-    <!-- Registration form -->
-        <form action="/register" method="post" style="width: 200px; margin: 0 auto;">
-        <!-- Username input field -->
-            <div class="form-group">
-                <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text" required>
+    <div class="container">
+        <div class="row">
+            <div class="col-md-6 text-left mt-5">
+                <h1>Welcome to Fox AI!</h1>
+                <p class="lead">Your AI assistant for creating stunning website assets.</p>
+                <p>
+                    Fox AI is a state-of-the-art application designed for developers, designers, and anyone who needs creative assets for their projects. With our easy-to-use platform, generate images, layouts, and more with the power of AI.
+                </p>
+                <p class="font-weight-bold">
+                    Get started with a free trial. It's completely free – start creating now!
+                </p>
+                <img src="/static/Fox1.webp" alt="Fox AI" class="img-fluid mt-3">
             </div>
 
-        <!-- Password input field -->
-            <div class="form-group">
-                <input class="form-control" name="password" placeholder="Password" type="password" required>
+            <div class="col-md-6 mt-5">
+                {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+                {% endif %}
+
+                <form action="/register" method="post" class="border p-4 shadow rounded bg-light">
+                    <h2 class="text-center mb-4">Create Your Free Account</h2>
+
+                    <!-- Name input field -->
+                    <div class="form-group mb-3">
+                        <input class="form-control" name="name" placeholder="Name" type="text" required>
+                    </div>
+
+                    <!-- Last Name input field -->
+                    <div class="form-group mb-3">
+                        <input class="form-control" name="last_name" placeholder="Last Name" type="text" required>
+                    </div>
+
+                    <!-- Phone Number input field -->
+                    <div class="form-group mb-3">
+                        <input class="form-control" name="phone_number" placeholder="Phone Number" type="tel" required>
+                    </div>
+
+                    <!-- Email input field -->
+                    <div class="form-group mb-3">
+                        <input class="form-control" name="email" placeholder="Email" type="email" required>
+                    </div>
+
+                    <!-- Username input field -->
+                    <div class="form-group mb-3">
+                        <input autocomplete="off" autofocus class="form-control" name="username" placeholder="Username" type="text" required>
+                    </div>
+
+                    <!-- Password input field -->
+                    <div class="form-group mb-3">
+                        <input class="form-control" name="password" placeholder="Password" type="password" required>
+                    </div>
+
+                    <!-- Confirm Password input field -->
+                    <div class="form-group mb-4">
+                        <input class="form-control" name="confirmation" placeholder="Confirm Password" type="password" required>
+                    </div>
+
+                    <!-- Register button -->
+                    <button class="btn btn-orange btn-block" type="submit">Get Started Now</button>
+                </form>
+
+                <p class="mt-3 text-center">
+                    Already have an account? <a href="/login">Log In</a>
+                </p>
+                
+                <p class="mt-3 text-center text-muted small">
+                    At Fox AI, we take your privacy seriously. Your data is protected with the latest technology and methods in AI, ensuring a secure and confidential experience.
+                </p>
             </div>
-
-        <!-- Confirm Password input field -->
-            <div class="form-group">
-                <input class="form-control" name="confirmation" placeholder="Confirm Password" type="password" required>
-            </div>
-
-        <!-- Register button -->
-            <button class="btn btn-dark" type="submit" style="width: 100%;">Register</button>
-        </form>
-
-    <!-- Link to login page -->
-        <p class="mt-3">
-            Already have an account? <a href="/login">Log In</a>
-        </p>
+        </div>
     </div>
 {% endblock %}
