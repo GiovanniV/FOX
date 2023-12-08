@@ -1,36 +1,68 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Welcome to Fox AI
+    Fox AI - Your Creative AI Companion
 {% endblock %}
 
 {% block main %}
-    <div class="container mt-2">
-        <div class="row">
-            <div class="col-lg-6">
-                <h2>Why Choose Fox AI?</h2>
-                <p>At Fox AI, we understand the challenges of creating engaging website content and visually appealing assets. Our AI-driven platform is designed to simplify the process for you. Here's why you should choose Fox AI:</p>
-                <ul>
-                    <li>Effortless Content Creation: Say goodbye to writer's block. Our AI can generate text content for your website, blogs, and more.</li>
-                    <li>Stunning Visuals: Generate high-quality images and graphics for your web projects with ease.</li>
-                    <li>Customization Options: Tailor content and images to your specific requirements, including style, dimensions, and format.</li>
-                    <li>Time and Cost Savings: Reduce the time and resources spent on content creation while maintaining quality.</li>
-                </ul>
-            </div>
-            <div class="col-lg-6">
-                <h2>How Fox AI Works</h2>
-                <p>Our platform leverages the power of artificial intelligence to provide you with outstanding results. Here's a glimpse into how Fox AI works:</p>
-                <ol>
-                    <li>Input Your Requirements: Simply describe your content or image needs, choose your preferences, and set the parameters.</li>
-                    <li>AI-Powered Generation: Our advanced AI algorithms get to work, generating content and images that match your criteria.</li>
-                    <li>Preview and Download: Review the generated content and visuals in real-time. If satisfied, download and use them for your projects.</li>
-                    <li>Endless Possibilities: Fox AI can create text content, images, and more, making it a versatile tool for web creators.</li>
-                </ol>
+<!-- Compact Hero Section -->
+<section class="hero-section bg-light text-center py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                    <img src="{{ url_for('static', filename='fox.png') }}" alt="Fox AI Logo" class="hero-logo img-fluid mb-2" style="max-width: 250px; transition: transform 0.3s;">
+                </a>
+                <h1 class="display-4 fw-bold text-dark">Discover Fox AI</h1>
+                <p class="text-muted mb-3">AI-Driven Creativity Unleashed</p> Dive into a universe of visual art, AI text generation, and intuitive design.</p>
+                <p class="hero-intro text-secondary mb-3">Join the innovative world of Fox AI, 
             </div>
         </div>
     </div>
+</section>
 
-    <div class="container mt-0 text-center">
-        <a href="{{ url_for('buy') }}" class="btn btn-orange btn-lg">Start Generating Images Now</a>
+<!-- Streamlined Features Section -->
+<section class="features-section bg-white text-center py-4">
+    <div class="container">
+        <h2 class="section-title text-dark mb-4">Fox AI's Features</h2>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <a href="buy" class="feature-item p-3" style="display: block; text-decoration: none;">
+                    <img src="{{ url_for('static', filename='fox4.jpg') }}" alt="Visuals" class="feature-img img-fluid mb-2" style="height: 150px; transition: transform 0.3s;">
+                    <h4 class="feature-title mb-1">Visuals</h4>
+                    <p class="feature-desc text-muted">Transform concepts into stunning visuals.</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="create" class="feature-item p-3" style="display: block; text-decoration: none;">
+                    <img src="{{ url_for('static', filename='6.webp') }}" alt="Text Mastery" class="feature-img img-fluid mb-2" style="height: 150px; transition: transform 0.3s;">
+                    <h4 class="feature-title mb-1">AI Text</h4>
+                    <p class="feature-desc text-muted">Innovate with AI-generated text.</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                
+                    <img src="{{ url_for('static', filename='fox11.webp') }}" alt="Creative Freedom" class="feature-img img-fluid mb-2" style="height: 150px; transition: transform 0.3s;">
+                    <h4 class="feature-title mb-1">Coding</h4>
+                    <p class="feature-desc text-muted">Explore limitless programming possibilities.COMING SOON</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                
+                    <img src="{{ url_for('static', filename='8.webp') }}" alt="UI Design" class="feature-img img-fluid mb-2" style="height: 150px; transition: transform 0.3s;">
+                    <h4 class="feature-title mb-1">UI Design</h4>
+                    <p class="feature-desc text-muted">Craft user interfaces with ease.COMING SOON</p>
+                </a>
+            </div>
+        </div>
     </div>
+</section>
+
+ <!-- Information about Fox AI Creator -->
+ <div class="row mt-4">
+    <div class="col-md-12 text-center">
+        <p class="text-muted">Crafted with passion by Giovanni Venegas as the final project for Harvard's CS50 course in 2023.</p>
+    </div>
+</div>
+</div>
+</div> <!-- Close the 'main' div properly -->
 {% endblock %}

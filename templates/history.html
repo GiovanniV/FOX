@@ -1,23 +1,59 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Images Generated
+    Your Fox AI Image Gallery - Create and Design with AI
 {% endblock %}
 
-{% block content %}
-    <h1>Images Generated</h1>
+{% block main %}
+<div class="container">
+    <!-- User's Image Gallery Header -->
+    <div class="row my-4">
+        <div class="col-md-12 text-center">
+            <h1 class="display-4">Your Creative Journey with Fox AI</h1>
+            <p class="lead mt-3">
+                Welcome back! Explore your personal gallery of AI-generated images. Every creation is a testament to your unique design journey.
+            </p>
+        </div>
+    </div>
 
-    <!-- Gallery of Images -->
-    <div class="image-gallery">
-        {% for transaction in transactions %}
-            <div class="image-card">
-                <a href="{{ transaction.image_url }}" target="_blank">
-                    <img src="{{ transaction.image_url }}" alt="Image">
+    <!-- Reminder to Download Images -->
+    <div class="alert alert-success text-center mt-4" role="alert">
+        <strong class="text-black">Important:</strong> Download your creations now! All images will be automatically deleted within 1 hour.
+    </div>
+
+    <!-- Display All Images -->
+    <div class="row">
+        {% for image in images %}
+        <div class="col-md-4 mb-4">
+            <div class="card shadow">
+                <a href="{{ image[0] }}" data-lightbox="image-set" data-title="{{ image[1] }}" class="lightbox-trigger">
+                    <img src="{{ image[0] }}" class="card-img-top" alt="{{ image[1] }}">
                 </a>
-                <a href="{{ transaction.image_url }}" download="{{ transaction.filename }}">
-                    <button class="btn btn-primary">Download</button>
-                </a>
+                <div class="card-body text-center">
+                    <a href="{{ url_for('user_images.download_image', image_url=image[0]) }}" class="btn custom-orange-btn mt-1 w-100" download="{{ image[0].split('/')[-1] }}">Instant Download</a>
+                </div>
             </div>
+        </div>
         {% endfor %}
     </div>
+
+    <!-- Information about Fox AI Creator -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <p class="text-muted">Crafted with passion by Giovanni Venegas as the final project for Harvard's CS50 course in 2023.</p>
+        </div>
+    </div>
+</div>
+
+<!-- Include Lightbox2 CSS and JavaScript files -->
+<link rel="stylesheet" href="{{ url_for('static', filename='lightbox.min.css') }}">
+<script src="{{ url_for('static', filename='lightbox.min.js') }}"></script>
+
+<script>
+    // Initialize Lightbox2
+    lightbox.option({
+        'resizeDuration': 200,
+        'wrapAround': true
+    });
+</script>
 {% endblock %}

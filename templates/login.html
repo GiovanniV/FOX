@@ -16,97 +16,7 @@
     <!-- Favicon -->
     <link rel="icon" type="image/png" href="/static/fox.png" sizes="400x400">
     
-    <title>FoxAI Image Generator 2023: Log In</title>
-
-    <!-- Custom CSS for Hover Color, Sticky Navbar, and Larger Logo -->
-    <style>
-        .navbar-nav li.nav-item:hover a.nav-link {
-            color: orange !important;
-        }
-
-        .navbar-sticky {
-            position: sticky;
-            top: 0;
-            z-index: 1020;
-            background-color: white;
-            transition: box-shadow 0.3s;
-        }
-
-        .navbar-scrolled {
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .navbar-brand {
-            position: relative;
-            padding: 0;
-        }
-
-        .favicon {
-            position: absolute;
-            top: -20px; /* Adjust this to control the vertical position */
-            left: 0;
-            height: auto;
-            width: 200px; /* Adjust the size as needed */
-            max-width: none;
-        }
-
-        /* Fixed Footer */
-        .footer-fixed {
-            position: fixed;
-            bottom: 0;
-            width: 100%;
-            background-color: white;
-            padding: 15px 0;
-            text-align: center;
-            z-index: 1030; /* Make sure it's above the navbar */
-        }
-
-        /* Custom CSS from style.css */
-        /* General body styling */
-        body {
-            font-family: 'Arial', sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-        }
-
-        /* Header styling */
-        header {
-            background-color: #333;
-            color: #fff;
-            padding: 10px 0;
-            text-align: center;
-        }
-
-        /* ... (other styles from style.css) ... */
-
-        /* Custom button styles */
-        .btn-orange {
-            background-color: #FF4500; /* Orange background */
-            color: #fff; /* White text color */
-            border: none; /* Remove border */
-            cursor: pointer; /* Cursor to pointer to indicate it's clickable */
-            text-transform: uppercase; /* Optional: to make text uppercase */
-            font-size: 1em; /* Font size */
-            border-radius: 5px; /* Optional: to add rounded corners */
-        }
-
-        .btn-orange:hover {
-            background-color: #FF3000; /* Slightly darker orange for hover effect */
-        }
-
-        /* Custom class to style login hyperlink */
-        .login-link {
-            display: block;
-            width: 100%; /* Make it the same width as input boxes */
-            text-align: center;
-        }
-
-        /* CSS to hide navigation links on the login page */
-        .login-page .navbar-nav {
-            display: none; /* Hide the navigation links */
-        }
-    </style>
+    <title>Welcome Back to FoxAI Image Generator 2023</title>
 </head>
 <body class="login-page">
     <!-- Navbar -->
@@ -134,8 +44,8 @@
     <main class="container mt-5">
         <!-- Welcome Section -->
         <div class="row justify-content-center">
-            <div class="col-md-6 text-center">
-                <h1 class="mb-4">Welcome Back</h1>
+            <div class="col-md-8 text-center">
+                <h1 class="display-3">Welcome Back</h1>
                 <p class="lead">Experience the power of AI creativity. Log in to explore a world of AI-generated images and inspiration.</p>
                 <img src="/static/fox3.webp" alt="Fox Image" class="img-fluid rounded-circle" style="width: 200px; height: 200px;">
             </div>
@@ -156,7 +66,38 @@
                     </div>
 
                     <!-- Log In Button (Submit Button) -->
-                    <button type="submit" class="btn btn-orange btn-block" style="width: 100%;">Log In</button>
+                    <div class="mb-3 text-center">
+                        <button type="submit" id="login-button" class="btn btn-orange btn-lg">
+                            <span>Login</span>
+                            <div class="spinner-border spinner-border-sm d-none" role="status">
+                                <span class="visually-impaired">...FOXAI</span>
+                            </div>
+                        </button>
+                    </div>
+
+                    <script>
+                        // Get references to the button and the spinner
+                        const loginButton = document.getElementById('login-button');
+                        const spinner = loginButton.querySelector('.spinner-border');
+                    
+                        // Add an event listener to the form for submission
+                        document.querySelector('form').addEventListener('submit', function (event) {
+                            // Prevent the default form submission behavior
+                            event.preventDefault();
+                    
+                            // Disable the button to prevent multiple submissions
+                            loginButton.disabled = true;
+                    
+                            // Change the button text to "Logging In..."
+                            loginButton.querySelector('span').textContent = 'Logging In...';
+                    
+                            // Show the spinner
+                            spinner.classList.remove('d-none');
+                    
+                            // Submit the form
+                            this.submit();
+                        });
+                    </script>
                 </form>
             </div>
         </div>
@@ -167,11 +108,18 @@
                 <p class="mb-3">Don't have an account yet? <a href="/register" class="login-link">Create Account</a></p>
             </div>
         </div>
+
+        <!-- Information about Fox AI Creator -->
+        <div class="row mt-4">
+            <div class="col-md-12 text-center">
+                <p class="text-muted">Crafted with passion by Giovanni Venegas as the final project for Harvard's CS50 course in 2023.</p>
+            </div>
+        </div>
     </main>
 
     <!-- Fixed Footer -->
     <footer class="text-center text-muted py-3 footer-fixed">
-        <small>Fox AI Image Generator <a href="https://FOXAI.EI/" class="text-muted">FOX</a>.</small>
+        <small>FoxAI© 2023</a></small>
     </footer>
 
     <!-- Include Bootstrap JS and Dependencies -->

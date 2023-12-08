@@ -1,8 +1,67 @@
+/* Navbar link hover color */
+.navbar-nav li.nav-item:hover a.nav-link {
+    color: rgb(198, 88, 4) !important;
+}
+
+/* Sticky Navbar */
+.navbar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background-color: #A72BC5;
+    transition: box-shadow 0.3s;
+    /* Add your CSS code here */
+}
+
+.navbar-scrolled {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    position: relative;
+    padding: 0;
+}
+
+/* Favicon */
+.favicon {
+    position: absolute;
+    top: -20px; /* Adjust this to control the vertical position */
+    left: 0;
+    height: auto;
+    width: 200px; /* Adjust the size as needed */
+    max-width: none;
+    padding: 5px; /* Adjust padding as needed */
+    border-radius: 5px; /* Add rounded corners */
+}
+
+/* Hide the logo on screens with a maximum width of 768 pixels (mobile) */
+@media (max-width: 768px) {
+    .favicon {
+        display: none;
+    }
+}
+
+/* Fixed Footer */
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    padding: 15px 0;
+    text-align: center;
+    z-index: 1030; /* Make sure it's above the navbar */
+}
+
+
+/* Reset some default styles */
+body, h1, h2, h3, p {
+    margin: 0;
+    padding: 0;
+}
+
 /* General body styling */
 body {
     font-family: 'Arial', sans-serif;
-    margin: 0;
-    padding: 0;
     background-color: #f4f4f4;
 }
 
@@ -16,9 +75,9 @@ header {
 
 /* Custom CSS for favicon */
 .favicon {
-    width: 200px; /* Adjust the size as needed */
-    height: 200px; /* Adjust the size as needed */
-    margin-right: 10px; /* Adjust the spacing as needed */
+    width: 200px;
+    height: 200px;
+    margin-right: 10px;
 }
 
 /* Navigation styling */
@@ -40,7 +99,7 @@ nav ul li a {
 /* Main content styling */
 main {
     padding: 20px;
-    min-height: 80vh; /* Viewport height */
+    min-height: 80vh;
 }
 
 /* Table styling */
@@ -56,8 +115,8 @@ table, th, td {
 
 th {
     height: 50px;
-    background-color: #A9A9A9; /* Dark grey background for headers */
-    color: #fff; /* White text color for headers */
+    background-color: #A9A9A9;
+    color: #fff;
     text-align: left;
 }
 
@@ -66,15 +125,17 @@ td {
     text-align: left;
 }
 
-/* Footer styling */
-footer {
-    background-color: #333;
-    color: #fff;
-    text-align: center;
-    padding: 10px 0;
-    position: relative;
+/* Fixed Footer */
+.footer-fixed {
+    position: fixed;
     bottom: 0;
+    left: 0;
+    right: 0;
     width: 100%;
+    background-color: white; /* Change this to white */
+    padding: 15px 0;
+    text-align: center;
+    z-index: 1030;
 }
 
 /* Utility classes */
@@ -96,6 +157,7 @@ footer {
     margin-bottom: 1.5em;
 }
 
+/* Table styles */
 .table-striped tbody tr:nth-of-type(odd) {
     background-color: #f9f9f9;
 }
@@ -105,69 +167,462 @@ footer {
 }
 
 .thead-dark {
-    background-color: #555;
+    background-color: #5CBDB7;
     color: #fff;
 }
 
 /* Button styling */
+.btn {
+    cursor: pointer;
+    text-transform: uppercase;
+    font-size: 1em;
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
 .btn-center-lg {
-    display: block; /* Necessary to apply margin: auto */
-    width: 50%; /* Set to desired width */
-    margin: 20px auto; /* Centers the button with top and bottom margin */
-    padding: 10px 0; /* Larger padding for bigger size */
-    background-color: #000; /* Black background */
-    color: #fff; /* White text */
-    border: none; /* Remove border */
-    cursor: pointer; /* Cursor to pointer to indicate it's clickable */
-    text-transform: uppercase; /* Optional: to make text uppercase */
-    font-size: 1.25em; /* Larger font size */
-    border-radius: 5px; /* Optional: to add rounded corners */
+    display: block;
+    width: 50%;
+    margin: 20px auto;
+    background-color: #000;
+    color: #fff;
 }
 
-/* Add this to change the hover state of buttons */
 .btn-center-lg:hover {
-    background-color: #333; /* Slightly lighter black for hover effect */
+    background-color: #E37437;
 }
 
-/* Custom button styles */
 .btn-orange {
-    background-color: #FF4500; /* Orange background */
-    color: #fff; /* White text color */
-    border: none; /* Remove border */
-    cursor: pointer; /* Cursor to pointer to indicate it's clickable */
-    text-transform: uppercase; /* Optional: to make text uppercase */
-    font-size: 1em; /* Font size */
-    border-radius: 5px; /* Optional: to add rounded corners */
+    background-color: #5CBDB7;
+    color: #fff;
 }
 
 .btn-orange:hover {
-    background-color: #FF3000; /* Slightly darker orange for hover effect */
+    background-color: #E37437;
 }
 
 .btn-dark-orange {
-    background-color: #FF3000; /* Darker orange background */
+    background-color: #E37437;
+    color: #fff;
+}
+
+.btn-dark-orange:hover {
+    background-color: #5CBDB7;
+}
+
+.btn-light-grey {
+    background-color: #F3B13E;
+    color: #000;
+}
+
+.btn-light-grey:hover {
+    background-color: #E37437;
+}
+
+/* Additional styles go here */
+
+/* styles.css */
+.red-text {
+    color: #E37437;
+}
+
+.large-text {
+    font-size: 16px;
+}
+
+.text-orange {
+    color: #E37437;
+}
+
+/* Style for the image container */
+.image-container {
+    text-align: center;
+    margin-top: 20px; /* Adjust the margin as needed */
+}
+
+/* Style for the image */
+.image-container img {
+    max-width: 40%; /* Reduce the max-width to make the image 40% smaller */
+    height: auto;
+}
+
+/* Style for generated content */
+.generated-content {
+    padding: 20px;
+    background-color: #E37437;
+    border: 1px solid #5CBDB7;
+    border-radius: 5px;
+    margin-top: 20px;
+    background-image: url('/static/fox4.jpg');
+    background-size: cover;
+    background-repeat: no-repeat;
+    background-position: center;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    min-height: 500px;
+    align-items: center;
+    text-align: center;
+}
+
+/* Style for the generated content text box */
+#generated-content-textbox {
+    background-color: rgba(255, 255, 255, 0.97);
+    padding: 15px;
+    border-radius: 5px;
+    box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    flex-grow: 1;
+    width: 100%;
+    margin-bottom: 5px;
+}
+
+/* Style for the button container */
+.button-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 0;
+}
+
+/* Style for buttons */
+.button-container > button {
+    width: 100%;
+    margin: 10px 0;
+    padding: 10px;
+}
+
+/* Style for the generate content button */
+#generate-content {
+    background-color: #E37437;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+/* Style for copy and edit buttons */
+#copy-content,
+#edit-content {
+    background-color: #5CBDB7;
+    color: white;
+    border-color: #F3B13E;
+}
+
+#copy-content:hover,
+#edit-content:hover {
+    background-color: #5CBDB7;
+    color: white;
+    border-color: #A72BC5;
+}
+
+/* Additional styles for other buttons can be added here */
+
+/* Set the button width to match the form box width */
+#generate-content {
+    width: 100%;
+}
+
+.title {
+    padding-bottom: 20px;
+}
+
+/* Style for Edit Text and Save Changes buttons */
+#edit-content,
+#save-content {
+    display: none;
+}
+
+/* Style for the Save Changes button */
+#save-content {
+    background-color: #E37437
+}
+
+/* Style for result options */
+.result-options {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.result-options button {
+    margin-left: 10px;
+    font-size: 14px;
+}
+
+/* Custom CSS for positioning the logo */
+@media (max-width: 768px) {
+    .navbar-toggler {
+        order: 2; /* Change the order of the hamburger menu button */
+    }
+
+    .navbar-brand {
+        order: 1; /* Change the order of the logo */
+        margin-top: 10px; /* Add margin for spacing */
+    }
+}
+
+/* Custom orange button */
+.custom-orange-btn {
+    background-color: #E37437; /* Replace with your desired orange color code */
+    color: #ffffff; /* Text color for the button */
+    /* Add any other custom styles as needed */
+}
+
+/* Add the CSS code provided earlier */
+select#project_type {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #f8f8f8;
+}
+
+optgroup {
+    font-weight: bold;
+    background-color: #ddd;
+}
+
+option {
+    padding: 5px;
+}
+
+/* Any other custom styles can be added below */
+
+
+/* Initially hide the "Edit Text" and "Save Changes" buttons */
+#edit-content,
+#save-content {
+    display: none;
+}
+
+/* Style the "Save Changes" button to make it orange */
+#save-content {
+    background-color: #E37437;
+}
+
+/* Adjust the position of the buttons and make them proportional */
+.result-options {
+    text-align: right;
+    margin-top: 20px;
+}
+
+.result-options button {
+    margin-left: 10px;
+    font-size: 14px; /* Adjust the font size as needed */
+}
+
+/* Initially hide the advanced options */
+.advanced-options {
+    display: none;
+}
+
+/* styles.css */
+/* Add padding to form elements */
+.form-group {
+    margin-bottom: 20px; /* Adds space below each form group */
+}
+
+/* Add padding to titles */
+h1, h4 {
+    margin-bottom: 20px; /* Adds space below titles */
+}
+
+/* Add padding to paragraphs */
+p {
+    margin-bottom: 20px; /* Adds space below paragraphs */
+}
+
+/* Add padding to the advanced options link */
+#toggle-advanced-options {
+    margin-bottom: 20px; /* Adds space below the link */
+}
+
+/* Default state */
+#generate-content {
+    background-color: #5CBDB7; /* Default background color */
+    color: #ffffff; /* Default text color */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transition effect for hover and click */
+}
+
+/* Hover state */
+#generate-content:hover {
+    background-color: #E37437; /* Background color on hover */
+    color: #ffffff; /* Text color on hover */
+}
+
+/* Clicked state */
+#generate-content:active {
+    background-color: #F3B13E; /* Background color when clicked */
+    color: #ffffff; /* Text color when clicked */
+}
+
+
+
+    .profile-management {
+        max-width: 800px;
+        margin: auto;
+        padding: 20px;
+        background-color: #f5f5f5;
+        border-radius: 5px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        font-size: 24px;
+        margin-bottom: 20px;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    .form-control {
+        border-radius: 5px;
+        border: 1px solid #ced4da;
+    }
+
+    .btn-success {
+        background-color: #E37437;
+        border-color: #A72BC5 ;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    .btn-success:hover {
+        background-color: #5CBDB7;
+        border-color: #F3B13E;
+    }
+
+
+/* Add your custom CSS styles here */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 20px;
+    padding: 10px;
+  }
+  
+  h1 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+  }
+  
+  p {
+    font-size: 16px;
+    margin-bottom: 10px;
+  }
+
+  /* Custom CSS for Hover Color, Sticky Navbar, and Larger Logo */
+.navbar-nav li.nav-item:hover a.nav-link {
+    color: orange !important;
+}
+
+.navbar-sticky {
+    position: sticky;
+    top: 0;
+    z-index: 1020;
+    background-color: white;
+    transition: box-shadow 0.3s;
+}
+
+.navbar-scrolled {
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbar-brand {
+    position: relative;
+    padding: 0;
+}
+
+/* Favicon */
+.favicon {
+    position: absolute;
+    top: -20px; /* Adjust this to control the vertical position */
+    left: 0;
+    height: auto;
+    width: 200px; /* Adjust the size as needed */
+    max-width: none;
+}
+
+/* Fixed Footer */
+.footer-fixed {
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    background-color: white;
+    padding: 15px 0;
+    text-align: center;
+    z-index: 1030; /* Make sure it's above the navbar */
+}
+
+/* Custom CSS from style.css */
+/* General body styling */
+body {
+    font-family: 'Arial', sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f4f4f4;
+}
+
+/* Header styling */
+header {
+    background-color: #333;
+    color: #fff;
+    padding: 10px 0;
+    text-align: center;
+}
+
+/* ... (other styles from style.css) ... */
+
+/* Custom button styles */
+.btn-orange {
+    background-color: #E37437; /* Orange background */
     color: #fff; /* White text color */
     border: none; /* Remove border */
     cursor: pointer; /* Cursor to pointer to indicate it's clickable */
     text-transform: uppercase; /* Optional: to make text uppercase */
     font-size: 1em; /* Font size */
     border-radius: 5px; /* Optional: to add rounded corners */
+    width: 100%; /* Make the button cover the login fields */
 }
 
-.btn-dark-orange:hover {
-    background-color: #FF3000; /* Slightly darker orange for hover effect */
+.btn-orange:hover {
+    background-color: #5CBDB7; /* Slightly darker orange for hover effect */
 }
 
-.btn-light-grey {
-    background-color: #d3d3d3; /* Light grey background */
-    color: #000; /* Black text color */
-    border: none; /* Remove border */
-    cursor: pointer; /* Cursor to pointer to indicate it's clickable */
-    text-transform: uppercase; /* Optional: to make text uppercase */
-    font-size: 1em; /* Font size */
-    border-radius: 5px; /* Optional: to add rounded corners */
+/* Custom class to style login hyperlink */
+.login-link {
+    display: block;
+    width: 100%; /* Make it the same width as input boxes */
+    text-align: center;
 }
 
-.btn-light-grey:hover {
-    background-color: #c0c0c0; /* Slightly darker grey for hover effect */
+/* CSS to hide navigation links on the login page */
+.login-page .navbar-nav {
+    display: none; /* Hide the navigation links */
 }
+
+/* CSS for Fading Alert */
+.fade {
+    animation: fadeOut 5s ease-in-out forwards;
+}
+
+@keyframes fadeOut {
+    0% {
+        opacity: 1;
+    }
+    90% {
+        opacity: 1;
+    }
+    100% {
+        opacity: 0;
+        display: none;
+    }
+}
+
+  /* Add more custom styles as needed */

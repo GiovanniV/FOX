@@ -1,4 +1,4 @@
-#!/Users/venegas/Desktop/fox/finance/venv/bin/python3.11
+#!/Users/venegas/Desktop/fox/fox1/FOX/venv/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys

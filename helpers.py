@@ -1,160 +1,117 @@
-import requests
-from urllib.parse import quote_plus
-from functools import wraps
-from flask import (
-    Flask,
-    render_template,
-    redirect,
-    session,
-    request,
-    jsonify
-)
-import openai
+import psycopg2
+from flask import Flask, render_template, redirect, session
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
+import openai
+from functools import wraps
+import json
 
+
+# Initialize the Flask app
 app = Flask(__name__)
 
-# Define the OpenAI API base URL
-OPENAI_API_BASE_URL = "https://api.openai.com/v1/"
+# Function to retrieve the OpenAI API key from Azure Key Vault
+def get_openai_api_key():
+    try:
+        key_vault_url = "https://masterfox.vault.azure.net/"
+        SECRET_NAME = "ok1"  # Replace with your secret name
+        credential = DefaultAzureCredential()
+        client = SecretClient(vault_url=key_vault_url, credential=credential)
+        
+        secret = client.get_secret(SECRET_NAME)
+        return secret.value
+    except Exception as e:
+        print(f"Error while retrieving OpenAI API key: {e}")
+        return None
 
-def apology(message, code=400):
-    """
-    Render message as an apology to the user.
+# Function to establish a connection to the PostgreSQL database using Azure Key Vault
+def get_db_connection():
+    try:
+        key_vault_url = "https://foxaimasterbd.vault.azure.net/"
+        SECRET_NAME = "fox2"  # The name of your secret in Azure Key Vault
+        credential = DefaultAzureCredential()
+        client = SecretClient(vault_url=key_vault_url, credential=credential)
 
-    Args:
-        message (str): The apology message to display.
-        code (int): The HTTP status code for the response.
+        # Retrieve the secret from Azure Key Vault
+        secret = client.get_secret(SECRET_NAME)
+        print(f"Retrieved secret: {secret}")
 
-    Returns:
-        str: Rendered HTML apology page.
-    """
-    def escape(s):
-        """
-        Escape special characters in a string.
+        # Parse the JSON string to get the database credentials
+        db_credentials = json.loads(secret.value)
+        print(f"Database credentials: {db_credentials}")
 
-        Args:
-            s (str): The input string.
+        # Use the credentials to establish the database connection
+        connection = psycopg2.connect(
+            user=db_credentials["user"],
+            password=db_credentials["password"],
+            host=db_credentials["host"],
+            port=db_credentials["port"],
+            database=db_credentials["database"],
+        )
 
-        Returns:
-            str: The escaped string.
-        """
-        for old, new in [
-            ("-", "--"),
-            (" ", "-"),
-            ("_", "__"),
-            ("?", "~q"),
-            ("%", "~p"),
-            ("#", "~h"),
-            ("/", "~s"),
-            ('"', "''"),
-        ]:
-            s = s.replace(old, new)
-        return s
+        return connection
+    except Exception as e:
+        print(f"Error while establishing database connection: {e}")
+        return None
 
-    return render_template("apology.html", top=code, bottom=escape(message)), code
-
+# Decorator to require login
 def login_required(f):
-    """
-    Decorate routes to require login.
-
-    Args:
-        f (function): The route function to decorate.
-
-    Returns:
-        function: The decorated route function.
-    """
     @wraps(f)
     def decorated_function(*args, **kwargs):
         if session.get("user_id") is None:
             return redirect("/login")
         return f(*args, **kwargs)
-
     return decorated_function
 
-def get_openai_api_key():
-    """
-    Retrieve the OpenAI API key from Azure Key Vault.
+# Function to render an apology message
+def apology(message, code=400):
+    return render_template("apology.html", top=code, bottom=message), code
 
-    Returns:
-        str: The OpenAI API key.
-    """
-    # Azure Key Vault configuration
-    key_vault_url = "https://gio.vault.azure.net/"
-    secret_name = "OpenAIKey"
-
-    # Create a SecretClient using DefaultAzureCredential
-    credential = DefaultAzureCredential()
-    client = SecretClient(vault_url=key_vault_url, credential=credential)
-
+# Function to generate an image using OpenAI's API and store it
+def generate_image_and_store(openai_api_key, description, image_style, image_dimensions="1024x1024", image_quality="best", **kwargs):
     try:
-        # Retrieve the OpenAI API key from Azure Key Vault
-        secret = client.get_secret(secret_name)
+        if not openai_api_key:
+            print("OpenAI API key is missing or invalid")
+            return None
 
-        # Return the OpenAI API key as a string
-        return secret.value
+        supported_sizes = ["1024x1024", "1024x1792", "1792x1024"]
+        
+        # Check if the specified size is supported
+        if image_dimensions not in supported_sizes:
+            print(f"Unsupported image size '{image_dimensions}'. Defaulting to '1024x1024'.")
+            image_dimensions = "1024x1024"
+
+        # Build the prompt for image generation
+        prompt = f"Generate an image that is {image_dimensions} in size, Style: {image_style}, Description: {description}, Quality: {image_quality}"
+        
+        # Adding optional parameters to the prompt
+        optional_params = ['image_format']
+        for param in optional_params:
+            if param in kwargs:
+                prompt += f", {param.capitalize()}: {kwargs[param]}"
+
+        client = openai.Client(api_key=openai_api_key)
+
+        # Call the OpenAI API to generate the image
+        response = client.images.generate(model="DALL·E 3", prompt=prompt, n=1, size=image_dimensions)
+        print("Response from OpenAI API:")
+        print(response)
+
+        if response and 'data' in response and response['data']:
+            image_url = response['data'][0].get('url')
+            
+            if image_url:
+                # Store image URL in the database (implement your database logic here)
+                return image_url
+            else:
+                print("No image URL found in response")
+                return None
+        else:
+            print("Invalid or empty response from the API")
+            return None
 
     except Exception as e:
-        print(f"Error while retrieving OpenAI API key from Azure Key Vault: {e}")
-        return None
-
-def lookup(symbol):
-    try:
-        # Your implementation for the lookup function goes here
-        return None
-    except (requests.RequestException, ValueError, KeyError):
-        return None
-
-def usd(value):
-    return f"${value:,.2f}"
-
-def generate_image(description, image_style, image_dimensions, **kwargs):
-    """
-    Generate an image using the OpenAI API based on the description, style, and dimensions.
-
-    Args:
-        description (str): The description of the image.
-        image_style (str): The style to be applied to the image.
-        image_dimensions (str): The dimensions of the image.
-        kwargs (dict): Optional keyword arguments, including image_format and image_quality.
-
-    Returns:
-        str: URL of the generated image.
-    """
-    try:
-        # Retrieve the OpenAI API key from Azure Key Vault
-        openai_api_key = get_openai_api_key()
-
-        if openai_api_key:
-            # Configure the OpenAI API key
-            openai.api_key = openai_api_key
-
-            prompt = description
-
-            # Add the style and dimensions to the prompt
-            prompt += f", {image_style}, {image_dimensions}"
-
-            # Check if image_format and image_quality are provided in kwargs
-            if 'image_format' in kwargs:
-                prompt += f", {kwargs['image_format']}"
-
-            if 'image_quality' in kwargs:
-                prompt += f", {kwargs['image_quality']}"
-
-            response = openai.Image.create(
-               model="dall-e-2",  # Specify the correct DALL·E model name
-               prompt=prompt,
-               n=1,
-               size="1024x1024"  # Adjust as needed
-            )
-
-            # Extract the URL of the generated image
-            image_url = response.data[0]['url']
-
-            return image_url
-
-    except Exception as e:
-        print(f"Error in generate_image: {e}")
+        print(f"Error during image generation: {e}")
         return None
 
 if __name__ == "__main__":
