@@ -24,12 +24,6 @@ jobs:
       with:
         python-version: '3.8'
 
-    - name: Create Virtual Environment
-      run: python -m venv venv
-
-    - name: Activate Virtual Environment
-      run: source venv/bin/activate
-
     - name: Install Python dependencies
       run: |
         pip install -r requirements.txt
