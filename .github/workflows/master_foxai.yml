@@ -19,17 +19,19 @@ jobs:
       with:
         node-version: 16.x
 
-
-
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
         python-version: '3.8'
 
+    - name: Create Virtual Environment
+      run: python -m venv venv
+
+    - name: Activate Virtual Environment
+      run: source venv/bin/activate
+
     - name: Install Python dependencies
       run: |
-        python -m venv venv
-        source venv/bin/activate
         pip install -r requirements.txt
 
     - name: Zip the application for deployment
