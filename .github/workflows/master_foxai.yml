@@ -33,5 +33,5 @@ jobs:
       with:
         app-name: 'foxai' # Replace with your Azure App Service name
         slot-name: 'production' # Adjust if deploying to a specific slot
-        publish-profile: ${{TvwyYc2xJApXladautrkgyPKygXX27oFQT1haoWEeb4DFWputlXcvpA2CgM4 }} # Set your Azure publish profile as a GitHub secret
+        publish-profile: ${{ secrets.AZUREAPPSERVICE_PUBLISHPROFILE_814E5FD1DC324511B8990AD3799A98A9 }}
         package: deploy.zip
