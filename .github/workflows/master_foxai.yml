@@ -17,7 +17,7 @@ jobs:
     - name: Set up Python
       uses: actions/setup-python@v2
       with:
-        python-version: '3.8' # Replace with your Python version
+        python-version: '3.11.6' 
 
     - name: Install Python dependencies
       run: |
@@ -31,7 +31,7 @@ jobs:
     - name: Deploy to Azure Web App
       uses: azure/webapps-deploy@v2
       with:
-        app-name: 'YOUR_APP_SERVICE_NAME' # Replace with your Azure App Service name
+        app-name: 'foxai' # Replace with your Azure App Service name
         slot-name: 'production' # Adjust if deploying to a specific slot
-        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }} # Set your Azure publish profile as a GitHub secret
+        publish-profile: ${{TvwyYc2xJApXladautrkgyPKygXX27oFQT1haoWEeb4DFWputlXcvpA2CgM4 }} # Set your Azure publish profile as a GitHub secret
         package: deploy.zip
