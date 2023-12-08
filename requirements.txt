@@ -1,10 +1,10 @@
 gunicorn==21.2.0
 packaging==23.2
-Flask==2.1.0
+Flask==2.1.1
 Flask-Session==0.4.0
 requests==2.26.0
 openai==0.27.0
 azure-identity==1.7.1
 azure-keyvault-secrets==4.7.0
 psycopg2==2.9.3
-Werkzeug==2.1.0  # Specify the version compatible with Flask 2.1.0
+Werkzeug==2.1.0  # Specify the version compatible with Flask 2.1.1
