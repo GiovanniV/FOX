@@ -6,6 +6,7 @@ import json  # Add this import for JSON handling
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
 from helpers import login_required
+from helpers import login_required, get_openai_api_key, get_db_connection
 
 app = Flask(__name__)
 user_images = Blueprint('user_images', __name__)
@@ -25,31 +26,6 @@ def get_openai_api_key():
         print(f"Error while retrieving OpenAI API key: {e}")
         return None
 
-# Function to establish a connection to the PostgreSQL database using Azure Key Vault
-def get_db_connection():
-    try:
-        key_vault_url = "https://foxaimasterbd.vault.azure.net/"
-        SECRET_NAME = "fox2"  # The name of your database credentials secret in Azure Key Vault
-        credential = DefaultAzureCredential()
-        client = SecretClient(vault_url=key_vault_url, credential=credential)
-
-        # Retrieve the secret from Azure Key Vault
-        secret = client.get_secret(SECRET_NAME)
-        db_credentials = json.loads(secret.value)
-
-        # Use the credentials to establish the database connection
-        connection = psycopg2.connect(
-            user=db_credentials["user"],
-            password=db_credentials["password"],
-            host=db_credentials["host"],
-            port=db_credentials["port"],
-            database=db_credentials["database"],
-        )
-
-        return connection
-    except Exception as e:
-        print(f"Error while establishing database connection: {e}")
-        return None
 
 def remove_unavailable_images(cursor, user_id):
     cursor.execute("SELECT id, image_url FROM images WHERE user_id = %s", (user_id,))
