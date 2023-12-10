@@ -10,6 +10,16 @@ jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
 
+    env:  # Define your environment variables here
+      DB_CONNECTION_STRING: '{
+        "user": "Giovanni",
+        "password": "Foxai2024",
+        "host": "foxaidbvsflex.postgres.database.azure.com",
+        "port": 5432,
+        "database": "foxaidbflex"
+      }'
+      OPENAI_API_KEY: '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'
+
     steps:
     - name: Checkout Repository
       uses: actions/checkout@v2
