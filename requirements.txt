@@ -8,3 +8,4 @@ azure-identity==1.7.1
 azure-keyvault-secrets==4.7.0
 psycopg2==2.9.3
 Werkzeug==2.1.0  # Specify the version compatible with Flask 2.1.1
+cryptography==3.4.8
