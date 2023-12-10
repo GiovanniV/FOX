@@ -13,8 +13,8 @@ app = Flask(__name__)
 # Function to retrieve the OpenAI API key from Azure Key Vault
 def get_openai_api_key():
     try:
-        key_vault_url = "https://masterfox.vault.azure.net/"
-        SECRET_NAME = "ok1"  # Replace with your secret name
+        key_vault_url = "https://foxaiv.vault.azure.net/"
+        SECRET_NAME = "OPENAIKEYV1"  # Replace with your secret name
         credential = DefaultAzureCredential()
         client = SecretClient(vault_url=key_vault_url, credential=credential)
         
@@ -27,8 +27,8 @@ def get_openai_api_key():
 # Function to establish a connection to the PostgreSQL database using Azure Key Vault
 def get_db_connection():
     try:
-        key_vault_url = "https://foxaimasterbd.vault.azure.net/"
-        SECRET_NAME = "fox2"  # The name of your secret in Azure Key Vault
+        key_vault_url = "https://foxaiv.vault.azure.net/"
+        SECRET_NAME = "DB1"  # The name of your secret in Azure Key Vault
         credential = DefaultAzureCredential()
         client = SecretClient(vault_url=key_vault_url, credential=credential)
 
