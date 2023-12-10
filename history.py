@@ -107,4 +107,5 @@ def download_image(image_url):
 app.register_blueprint(user_images, url_prefix='/images')
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=8000)
+
