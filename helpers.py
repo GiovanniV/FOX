@@ -114,5 +114,6 @@ def generate_image_and_store(openai_api_key, description, image_style, image_dim
         print(f"Error during image generation: {e}")
         return None
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8000)
+
