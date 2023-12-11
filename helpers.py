@@ -1,54 +1,29 @@
 import psycopg2
 from flask import Flask, render_template, redirect, session
-from azure.identity import DefaultAzureCredential
-from azure.keyvault.secrets import SecretClient
 import openai
 from functools import wraps
 import json
-
+import os  # Import the os module to access environment variables
 
 # Initialize the Flask app
 app = Flask(__name__)
 
-# Function to retrieve the OpenAI API key from Azure Key Vault
+# Function to retrieve the OpenAI API key from environment variables
 def get_openai_api_key():
-    try:
-        key_vault_url = "https://foxaiv.vault.azure.net/"
-        SECRET_NAME = "OPENAIKEYV1"  # Replace with your secret name
-        credential = DefaultAzureCredential()
-        client = SecretClient(vault_url=key_vault_url, credential=credential)
-        
-        secret = client.get_secret(SECRET_NAME)
-        return secret.value
-    except Exception as e:
-        print(f"Error while retrieving OpenAI API key: {e}")
-        return None
+    return os.environ.get("OPENAI_API_KEY")
 
-# Function to establish a connection to the PostgreSQL database using Azure Key Vault
+# Function to establish a connection to the PostgreSQL database using environment variables
 def get_db_connection():
     try:
-        key_vault_url = "https://foxaiv.vault.azure.net/"
-        SECRET_NAME = "DB1"  # The name of your secret in Azure Key Vault
-        credential = DefaultAzureCredential()
-        client = SecretClient(vault_url=key_vault_url, credential=credential)
+        db_credentials = {
+            "user": os.environ.get("DB_USER"),
+            "password": os.environ.get("DB_PASSWORD"),
+            "host": os.environ.get("DB_HOST"),
+            "port": os.environ.get("DB_PORT"),
+            "database": os.environ.get("DB_DATABASE"),
+        }
 
-        # Retrieve the secret from Azure Key Vault
-        secret = client.get_secret(SECRET_NAME)
-        print(f"Retrieved secret: {secret}")
-
-        # Parse the JSON string to get the database credentials
-        db_credentials = json.loads(secret.value)
-        print(f"Database credentials: {db_credentials}")
-
-        # Use the credentials to establish the database connection
-        connection = psycopg2.connect(
-            user=db_credentials["user"],
-            password=db_credentials["password"],
-            host=db_credentials["host"],
-            port=db_credentials["port"],
-            database=db_credentials["database"],
-        )
-
+        connection = psycopg2.connect(**db_credentials)
         return connection
     except Exception as e:
         print(f"Error while establishing database connection: {e}")
@@ -68,8 +43,10 @@ def apology(message, code=400):
     return render_template("apology.html", top=code, bottom=message), code
 
 # Function to generate an image using OpenAI's API and store it
-def generate_image_and_store(openai_api_key, description, image_style, image_dimensions="1024x1024", image_quality="best", **kwargs):
+def generate_image_and_store(description, image_style, image_dimensions="1024x1024", image_quality="best", **kwargs):
     try:
+        openai_api_key = get_openai_api_key()
+
         if not openai_api_key:
             print("OpenAI API key is missing or invalid")
             return None
@@ -114,6 +91,5 @@ def generate_image_and_store(openai_api_key, description, image_style, image_dim
         print(f"Error during image generation: {e}")
         return None
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
-
+if __name__ == "__main__":
+    app.run(debug=True)

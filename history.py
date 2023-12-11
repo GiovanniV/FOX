@@ -5,26 +5,10 @@ import psycopg2
 import json  # Add this import for JSON handling
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
-from helpers import login_required
 from helpers import login_required, get_openai_api_key, get_db_connection
 
 app = Flask(__name__)
 user_images = Blueprint('user_images', __name__)
-
-# Function to retrieve the OpenAI API key from Azure Key Vault
-def get_openai_api_key():
-    try:
-        key_vault_url = "https://foxaimasterbd.vault.azure.net/"
-        SECRET_NAME = "openai-api-key"  # The name of your OpenAI API key secret in Azure Key Vault
-        credential = DefaultAzureCredential()
-        client = SecretClient(vault_url=key_vault_url, credential=credential)
-
-        # Retrieve the OpenAI API key from Azure Key Vault
-        secret = client.get_secret(SECRET_NAME)
-        return secret.value
-    except Exception as e:
-        print(f"Error while retrieving OpenAI API key: {e}")
-        return None
 
 
 def remove_unavailable_images(cursor, user_id):
@@ -83,5 +67,4 @@ def download_image(image_url):
 app.register_blueprint(user_images, url_prefix='/images')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
-
+    app.run(debug=True)

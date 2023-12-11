@@ -3,8 +3,6 @@ import secrets
 from tempfile import mkdtemp  # Added import for mkdtemp
 import logging
 import openai
-from azure.identity import DefaultAzureCredential
-from azure.keyvault.secrets import SecretClient
 from flask import Flask, request, redirect, url_for, render_template, session, flash
 from werkzeug.utils import secure_filename
 from flask import Flask, flash, redirect, render_template, request, session, jsonify, url_for, send_from_directory
@@ -430,6 +428,5 @@ def not_found_error(error):
 def internal_error(error):
     return render_template("500.html"), 500
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
-
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8080, debug=True)

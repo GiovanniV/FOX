@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "base_no_nav.html" %}
 
 {% block title %}
     Register - FoxAI Image Generator
@@ -93,4 +93,29 @@
         document.getElementById('loadingMessage').style.display = 'block';
     });
 </script>
+{% endblock %}
+
+{% block navbar %}
+    {% if request.endpoint != 'register' %}
+        <!-- Navbar (Visible to Logged-In Users) -->
+        <nav class="navbar navbar-expand-md navbar-light bg-light border navbar-sticky">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="/">
+                    <img src="/static/fox.png" alt="Favicon" class="favicon">
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse justify-content-center" id="navbarNav">
+                    <ul class="navbar-nav">
+                        <li class="nav-item"><a class="nav-link" href="/create">AI Content Creation</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/buy">Generate AI Art</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/history">Active Gallery</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/account">Account</a></li>
+                        <li class="nav-item"><a class="nav-link" href="/logout">Logout</a></li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    {% endif %}
 {% endblock %}
