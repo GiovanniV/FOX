@@ -1,0 +1,1 @@
+{"version":"1.0","connections":[{"details":{"protocol":"postgresql","address":{"server":"foxai-server.postgres.database.azure.com","database":"foxai-database"}},"options":null}]}
