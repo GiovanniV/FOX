@@ -1,0 +1,610 @@
+{% extends "layout.html" %}
+
+{% block title %}
+    Create Content
+{% endblock %}
+
+{% block main %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Content</title>
+
+    <!-- Custom CSS -->
+    <style>
+        .form-group { margin-bottom: 20px; }
+        h1, h4 { margin-bottom: 20px; }
+        p { margin-bottom: 20px; }
+        #toggle-advanced-options { margin-bottom: 20px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+            <div class="row">
+                <!-- Left Column for Form or Operation Questions -->
+                <div class="col-md-6">
+                    <h1>FoxAI Content Generator</h1>
+                    <p>
+                        Get started with FoxAI content generation and say goodbye to writer's block and hello to endless possibilities!
+                    </p>
+
+                    <div class="question-options">
+                        <h4>Submit your Content Request</h4>
+                        <textarea class="form-control" id="content_request" rows="4" placeholder="Tell us what you need... (e.g., 'Write product descriptions for a home improvement website,' 'Generate a creative blog post about DIY projects,' 'Compose engaging content for a landscaping business')"></textarea>
+                    </div>
+                    <!-- Word Count Field (Moved above paragraphs) -->
+                    <div class="form-group">
+                        <label for="word_count">Word Count:</label>
+                        <input type="number" class="form-control" id="word_count" placeholder="Enter word count" min="0">
+                    </div>
+                    <div class="divider"></div>
+                    <div class="content-options">
+                        <form id="chat-form">
+                            <div class="form-group">
+                                <label for="number_of_paragraphs">Number of Paragraphs:</label>
+                                <input type="number" class="form-control" id="number_of_paragraphs" placeholder="Enter number of paragraphs" min="0">
+                            </div>
+                            <!-- Button to open advanced options -->
+                            <p>
+                                For better results, try FoxAI's Advance Options <br><a href="javascript:void(0);" id="toggle-advanced-options">Advance Options.</a>
+                            </p>
+
+                            <a href="javascript:void(0);" id="toggle-advanced-options"></a>
+                            <div class="advanced-options" style="display: none;"> <!-- Display the advanced options -->
+                                <div class="form-group">
+                                    <label for="project_type">Project Type:</label>
+                                    <select class="form-control" id="project_type">
+                                        <option value="none" selected>Select Project Type</option>
+                                        <optgroup label="Web">
+                                            <option value="website_content">Website Content</option>
+                                            <option value="blog_posts">Blog Posts</option>
+                                            <option value="seo_articles">SEO Articles</option>
+                                            <option value="social_media_posts">Social Media Posts</option>
+                                            <option value="email_newsletters">Email Newsletters</option>
+                                            <option value="product_descriptions">Product Descriptions</option>
+                                            <option value="landing_pages">Landing Pages</option>
+                                            <option value="e-commerce_product_listings">E-commerce Product Listings</option>
+                                            <option value="webinars">Webinars</option>
+                                            <option value="infographics">Infographics</option>
+                                            <option value="app_content">App Content</option>
+                                            <option value="video_descriptions">Video Descriptions</option>
+                                            <option value="forum_posts">Forum Posts</option>
+                                            <option value="website_reviews">Website Reviews</option>
+                                            <option value="press_releases">Press Releases</option>
+                                        </optgroup>
+                                        
+                                        <!-- Project Management -->
+                                        <optgroup label="Project Management">
+                                            <option value="jira_tickets">Jira Tickets</option>
+                                            <option value="project_plans">Project Plans</option>
+                                            <option value="status_reports">Status Reports</option>
+                                            <option value="risk_assessments">Risk Assessments</option>
+                                            <option value="resource_allocations">Resource Allocations</option>
+                                            <option value="project_charters">Project Charters</option>
+                                            <option value="meeting_minutes">Meeting Minutes</option>
+                                            <option value="sprint_planning">Sprint Planning</option>
+                                            <option value="agile_backlogs">Agile Backlogs</option>
+                                            <option value="release_notes">Release Notes</option>
+                                            <option value="change_requests">Change Requests</option>
+                                            <option value="stakeholder_communications">Stakeholder Communications</option>
+                                            <option value="project_dashboards">Project Dashboards</option>
+                                            <option value="project_closing_reports">Project Closing Reports</option>
+                                            <option value="project_proposals">Project Proposals</option>
+                                        </optgroup>
+                                        
+                                        <!-- Technical -->
+                                        <optgroup label="Technical">
+                                            <option value="user_manuals">User Manuals</option>
+                                            <option value="technical_documentation">Technical Documentation</option>
+                                            <option value="product_specifications">Product Specifications</option>
+                                            <option value="faqs">FAQs</option>
+                                            <option value="api_documentation">API Documentation</option>
+                                            <option value="tutorials">Tutorials</option>
+                                            <option value="troubleshooting_guides">Troubleshooting Guides</option>
+                                            <option value="whitepapers">Whitepapers</option>
+                                            <option value="research_papers">Research Papers</option>
+                                            <option value="case_studies">Case Studies</option>
+                                            <option value="knowledge_base_articles">Knowledge Base Articles</option>
+                                            <option value="code_documentation">Code Documentation</option>
+                                            <option value="software_manuals">Software Manuals</option>
+                                            <option value="technical_reports">Technical Reports</option>
+                                            <option value="installation_guides">Installation Guides</option>
+                                        </optgroup>
+                                        
+                                        <!-- Video and Multimedia -->
+                                        <optgroup label="Video and Multimedia">
+                                            <option value="youtube_hashtags">YouTube Hashtags</option>
+                                            <option value="youtube_video_title">YouTube Video Title</option>
+                                            <option value="youtube_video_description">YouTube Video Description</option>
+                                            <option value="youtube_meta_keywords">YouTube Meta Keywords</option>
+                                            <option value="youtube_thumbnail_description">YouTube Thumbnail Description</option>
+                                            <option value="youtube_transcripts">YouTube Transcripts</option>
+                                            <option value="video_scripts">Video Scripts</option>
+                                            <option value="dialogue_scripts">Dialogue Scripts</option>
+                                            <option value="movie_scripts">Movie Scripts</option>
+                                            <option value="video_storyboards">Video Storyboards</option>
+                                            <option value="podcast_scripts">Podcast Scripts</option>
+                                            <option value="voiceover_scripts">Voiceover Scripts</option>
+                                            <option value="animation_descriptions">Animation Descriptions</option>
+                                            <option value="multimedia_presentations">Multimedia Presentations</option>
+                                        </optgroup>
+                                        
+                                        <!-- Creative Writing -->
+                                        <optgroup label="Creative Writing">
+                                            <option value="short_stories">Short Stories</option>
+                                            <option value="novels">Novels</option>
+                                            <option value="poems">Poems</option>
+                                            <option value="creative_essays">Creative Essays</option>
+                                            <option value="screenplays">Screenplays</option>
+                                            <option value="playwriting">Playwriting</option>
+                                            <option value="song_lyrics">Song Lyrics</option>
+                                            <option value="comic_books">Comic Books</option>
+                                            <option value="childrens_stories">Children's Stories</option>
+                                            <option value="fantasy_fiction">Fantasy Fiction</option>
+                                            <option value="romantic_fiction">Romantic Fiction</option>
+                                            <option value="mystery_novels">Mystery Novels</option>
+                                            <option value="science_fiction">Science Fiction</option>
+                                            <option value="historical_fiction">Historical Fiction</option>
+                                            <option value="horror_stories">Horror Stories</option>
+                                        </optgroup>
+                                        
+                                        <!-- Music and Songwriting -->
+                                        <optgroup label="Music and Songwriting">
+                                            <option value="music_compositions">Music Compositions</option>
+                                            <option value="songwriting_lyrics">Songwriting Lyrics</option>
+                                            <option value="jingles">Jingles</option>
+                                            <option value="music_production">Music Production</option>
+                                            <option value="sheet_music">Sheet Music</option>
+                                            <option value="melodies">Melodies</option>
+                                            <option value="song_arrangements">Song Arrangements</option>
+                                            <option value="music_albums">Music Albums</option>
+                                            <option value="singer_songwriter">Singer-Songwriter Songs</option>
+                                            <option value="instrumental_tracks">Instrumental Tracks</option>
+                                            <option value="vocal_harmonies">Vocal Harmonies</option>
+                                            <option value="lyric_compositions">Lyric Compositions</option>
+                                            <option value="music_scores">Music Scores</option>
+                                            <option value="cover_song_arrangements">Cover Song Arrangements</option>
+                                        </optgroup>
+                                        
+                                        <!-- Programming -->
+                                        <optgroup label="Programming">
+                                            <option value="code_snippets">Code Snippets</option>
+                                            <option value="software_documentation">Software Documentation</option>
+                                            <option value="programming_tutorials">Programming Tutorials</option>
+                                            <option value="technical_blogs">Technical Blogs</option>
+                                            <option value="algorithms">Algorithms</option>
+                                            <option value="coding_challenges">Coding Challenges</option>
+                                            <option value="code_reviews">Code Reviews</option>
+                                            <option value="api_endpoints">API Endpoints</option>
+                                            <option value="programming_projects">Programming Projects</option>
+                                            <option value="coding_exercises">Coding Exercises</option>
+                                            <option value="programming_guides">Programming Guides</option>
+                                            <option value="software_reviews">Software Reviews</option>
+                                            <option value="programming_books">Programming Books</option>
+                                            <option value="debugging_techniques">Debugging Techniques</option>
+                                        </optgroup>
+                                        
+                                        <!-- Agile Development -->
+                                        <optgroup label="Agile Development">
+                                            <option value="agile_methodologies">Agile Methodologies</option>
+                                            <option value="scrum_framework">Scrum Framework</option>
+                                            <option value="kanban_system">Kanban System</option>
+                                            <option value="agile_tools">Agile Tools</option>
+                                            <option value="agile_coaching">Agile Coaching</option>
+                                            <option value="sprint_retrospectives">Sprint Retrospectives</option>
+                                            <option value="agile_metrics">Agile Metrics</option>
+                                            <option value="agile_ceremonies">Agile Ceremonies</option>
+                                            <option value="agile_principles">Agile Principles</option>
+                                            <option value="agile_case_studies">Agile Case Studies</option>
+                                            <option value="agile_training_materials">Agile Training Materials</option>
+                                            <option value="agile_project_templates">Agile Project Templates</option>
+                                            <option value="agile_best_practices">Agile Best Practices</option>
+                                            <option value="agile_sprint_goals">Agile Sprint Goals</option>
+                                        </optgroup>
+                                        <!-- Add more optgroup sections if needed -->
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="style">Style:</label>
+                                    <select class="form-control" id="style">
+                                        <option value="" disabled selected>Select Style</option>
+                                        <option value="formal">Formal</option>
+                                        <option value="casual">Casual</option>
+                                        <option value="professional">Professional</option>
+                                        <option value="creative">Creative</option>
+                                        <option value="academic">Academic</option>
+                                        <option value="technical">Technical</option>
+                                        <option value="conversational">Conversational</option>
+                                        <option value="persuasive">Persuasive</option>
+                                        <option value="journalistic">Journalistic</option>
+                                        <option value="humorous">Humorous</option>
+                                        <option value="poetic">Poetic</option>
+                                        <option value="scientific">Scientific</option>
+                                        <option value="narrative">Narrative</option>
+                                        <option value="instructional">Instructional</option>
+                                    </select>
+                                    
+                                </div>
+                                <div class="form-group">
+                                    <label for="topic">Topic:</label>
+                                    <select class="form-control" id="topic">
+                                        <option value="" disabled selected>Select Topic</option>
+                                        <optgroup label="Travel">
+                                            <option value="adventure_travel">Adventure Travel</option>
+                                            <option value="beach_vacations">Beach Vacations</option>
+                                            <option value="city_guides">City Guides</option>
+                                            <option value="cruises">Cruises</option>
+                                            <option value="family_travel">Family Travel</option>
+                                            <option value="luxury_travel">Luxury Travel</option>
+                                            <option value="solo_travel">Solo Travel</option>
+                                            <option value="wildlife_travel">Wildlife Travel</option>
+                                            <option value="cultural_experiences">Cultural Experiences</option>
+                                            <option value="food_and_travel">Food and Travel</option>
+                                            <option value="budget_travel">Budget Travel</option>
+                                            <option value="travel_tips">Travel Tips</option>
+                                            <option value="travel_gear">Travel Gear</option>
+                                        </optgroup>
+                                        <optgroup label="Health">
+                                            <option value="nutrition">Nutrition</option>
+                                            <option value="fitness">Fitness</option>
+                                            <option value="mental_health">Mental Health</option>
+                                            <option value="weight_loss">Weight Loss</option>
+                                            <option value="yoga_and_meditation">Yoga and Meditation</option>
+                                            <option value="medical_conditions">Medical Conditions</option>
+                                            <option value="wellness_treatments">Wellness Treatments</option>
+                                            <option value="health_tips">Health Tips</option>
+                                            <option value="healthy_recipes">Healthy Recipes</option>
+                                            <option value="alternative_medicine">Alternative Medicine</option>
+                                            <option value="aging_gracefully">Aging Gracefully</option>
+                                            <option value="mindfulness">Mindfulness</option>
+                                            <option value="healthy_lifestyle">Healthy Lifestyle</option>
+                                        </optgroup>
+                                        <optgroup label="Food">
+                                            <option value="recipes">Recipes</option>
+                                            <option value="cooking_techniques">Cooking Techniques</option>
+                                            <option value="food_trends">Food Trends</option>
+                                            <option value="restaurant_reviews">Restaurant Reviews</option>
+                                            <option value="culinary_travel">Culinary Travel</option>
+                                            <option value="dietary_restrictions">Dietary Restrictions</option>
+                                            <option value="food_and_culture">Food and Culture</option>
+                                            <option value="meal_planning">Meal Planning</option>
+                                            <option value="food_history">Food History</option>
+                                            <option value="baking">Baking</option>
+                                            <option value="healthy_eating">Healthy Eating</option>
+                                            <option value="food_blogging">Food Blogging</option>
+                                            <option value="food_photography">Food Photography</option>
+                                        </optgroup>
+                                        <optgroup label="Technology">
+                                            <option value="tech_news">Tech News</option>
+                                            <option value="gadgets">Gadgets</option>
+                                            <option value="software_reviews">Software Reviews</option>
+                                            <option value="coding_tutorials">Coding Tutorials</option>
+                                            <option value="tech_innovations">Tech Innovations</option>
+                                            <option value="cybersecurity">Cybersecurity</option>
+                                            <option value="data_science">Data Science</option>
+                                            <option value="artificial_intelligence">Artificial Intelligence</option>
+                                            <option value="blockchain">Blockchain</option>
+                                            <option value="virtual_reality">Virtual Reality</option>
+                                            <option value="internet_of_things">Internet of Things</option>
+                                            <option value="social_media">Social Media</option>
+                                            <option value="digital_marketing">Digital Marketing</option>
+                                        </optgroup>
+                                        <optgroup label="Business">
+                                            <option value="entrepreneurship">Entrepreneurship</option>
+                                            <option value="startups">Startups</option>
+                                            <option value="small_business">Small Business</option>
+                                            <option value="leadership">Leadership</option>
+                                            <option value="marketing_strategy">Marketing Strategy</option>
+                                            <option value="finance">Finance</option>
+                                            <option value="business_trends">Business Trends</option>
+                                            <option value="e-commerce">E-commerce</option>
+                                            <option value="workplace_culture">Workplace Culture</option>
+                                            <option value="business_ethics">Business Ethics</option>
+                                            <option value="sales_techniques">Sales Techniques</option>
+                                            <option value="management">Management</option>
+                                            <option value="public_relations">Public Relations</option>
+                                        </optgroup>
+                                        <optgroup label="Entertainment">
+                                            <option value="movies">Movies</option>
+                                            <option value="tv_shows">TV Shows</option>
+                                            <option value="celebrities">Celebrities</option>
+                                            <option value="music">Music</option>
+                                            <option value="video_games">Video Games</option>
+                                            <option value="comics">Comics</option>
+                                            <option value="books">Books</option>
+                                            <option value="pop_culture">Pop Culture</option>
+                                            <option value="celebrity_gossip">Celebrity Gossip</option>
+                                            <option value="entertainment_news">Entertainment News</option>
+                                            <option value="film_reviews">Film Reviews</option>
+                                            <option value="concerts">Concerts</option>
+                                            <option value="award_shows">Award Shows</option>
+                                        </optgroup>
+                                        <optgroup label="Science">
+                                            <option value="space">Space</option>
+                                            <option value="biology">Biology</option>
+                                            <option value="chemistry">Chemistry</option>
+                                            <option value="physics">Physics</option>
+                                            <option value="environment">Environment</option>
+                                            <option value="astronomy">Astronomy</option>
+                                            <option value="earth_sciences">Earth Sciences</option>
+                                            <option value="technology">Technology</option>
+                                            <option value="scientific_discoveries">Scientific Discoveries</option>
+                                            <option value="research">Research</option>
+                                            <option value="health_sciences">Health Sciences</option>
+                                            <option value="psychology">Psychology</option>
+                                            <option value="social_sciences">Social Sciences</option>
+                                        </optgroup>
+                                        <optgroup label="Education">
+                                            <option value="online_learning">Online Learning</option>
+                                            <option value="k-12_education">K-12 Education</option>
+                                            <option value="higher_education">Higher Education</option>
+                                            <option value="educational_technology">Educational Technology</option>
+                                            <option value="teaching_methods">Teaching Methods</option>
+                                            <option value="study_tips">Study Tips</option>
+                                            <option value="career_advice">Career Advice</option>
+                                            <option value="languages">Languages</option>
+                                            <option value="college_applications">College Applications</option>
+                                            <option value="homework_help">Homework Help</option>
+                                            <option value="online_courses">Online Courses</option>
+                                            <option value="e-learning">E-Learning</option>
+                                            <option value="student_life">Student Life</option>
+                                        </optgroup>
+                                        <optgroup label="Arts and Culture">
+                                            <option value="visual_arts">Visual Arts</option>
+                                            <option value="performing_arts">Performing Arts</option>
+                                            <option value="literature">Literature</option>
+                                            <option value="history">History</option>
+                                            <option value="architecture">Architecture</option>
+                                            <option value="design">Design</option>
+                                            <option value="film_and_cinema">Film and Cinema</option>
+                                            <option value="music">Music</option>
+                                            <option value="photography">Photography</option>
+                                            <option value="fashion">Fashion</option>
+                                            <option value="culinary_arts">Culinary Arts</option>
+                                            <option value="cultural_heritage">Cultural Heritage</option>
+                                            <option value="travel_culture">Travel Culture</option>
+                                        </optgroup>
+                                        <optgroup label="Sports">
+                                            <option value="football">Football</option>
+                                            <option value="basketball">Basketball</option>
+                                            <option value="soccer">Soccer</option>
+                                            <option value="baseball">Baseball</option>
+                                            <option value="tennis">Tennis</option>
+                                            <option value="golf">Golf</option>
+                                            <option value="olympics">Olympics</option>
+                                            <option value="athletics">Athletics</option>
+                                            <option value="cricket">Cricket</option>
+                                            <option value="rugby">Rugby</option>
+                                            <option value="cycling">Cycling</option>
+                                            <option value="motorsports">Motorsports</option>
+                                            <option value="combat_sports">Combat Sports</option>
+                                        </optgroup>
+                                        <optgroup label="Industries">
+                                            <option value="real_estate">Real Estate</option>
+                                            <option value="insurance">Insurance</option>
+                                            <option value="stocks">Stocks</option>
+                                            <option value="technology">Technology</option>
+                                            <option value="finance">Finance</option>
+                                            <option value="healthcare">Healthcare</option>
+                                            <option value="manufacturing">Manufacturing</option>
+                                            <option value="retail">Retail</option>
+                                            <option value="automotive">Automotive</option>
+                                            <option value="energy">Energy</option>
+                                            <option value="agriculture">Agriculture</option>
+                                            <option value="media_and_entertainment">Media and Entertainment</option>
+                                            <option value="hospitality">Hospitality</option>
+                                            <option value="education">Education</option>
+                                        </optgroup>
+                                        <!-- Add more topic categories with 13 options each if needed -->
+                                    </select>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="sentiment">Sentiment:</label>
+                                    <select class="form-control" id="sentiment">
+                                        <option value="" disabled selected>Select Sentiment</option>
+                                        <option value="positive">Positive</option>
+                                        <option value="negative">Negative</option>
+                                        <option value="neutral">Neutral</option>
+                                        <option value="joyful">Joyful</option>
+                                        <option value="angry">Angry</option>
+                                        <option value="hopeful">Hopeful</option>
+                                        <option value="excited">Excited</option>
+                                        <option value="sad">Sad</option>
+                                        <option value="calm">Calm</option>
+                                        <option value="frustrated">Frustrated</option>
+                                        <option value="surprised">Surprised</option>
+                                        <option value="confident">Confident</option>
+                                        <option value="anxious">Anxious</option>
+                                        <option value="optimistic">Optimistic</option>
+                                        <!-- Add more sentiment options here if needed -->
+                                    </select>
+                                </div>
+                                
+                            </div>
+                            <!-- Button with hover effect -->
+                            <button type="submit" class="btn btn-primary" id="generate-content"><div class="spinner-border spinner-border-sm d-none" role="status"></div>
+                                Create Content
+                                <span class="visually-hidden">Generating...</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+                <!-- Right Column for Generated Content -->
+                <div class="col-md-6">
+                    <div class="generated-content">
+                        <h4 id="generated-content-heading">Generated Content</h4>
+                        <div id="generated-content-textbox">
+                            <!-- The generated content will be displayed here -->
+                        </div>
+
+                        <!-- Buttons for Copy, Edit, and Save -->
+                        <div class="result-options" style="position: relative; text-align: center;">
+                            <div class="d-flex justify-content-center">
+                                <button class="btn btn-secondary btn-lg mx-2" id="copy-content" style="display: none;">Copy Text</button>
+                                <button class="btn btn-primary btn-lg mx-2" id="edit-content">Edit Text</button>
+                                <button class="btn btn-success btn-lg mx-2" id="save-content">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Information about Fox AI Creator -->
+    <div class="row mt-4">
+        <div class="col-md-12 text-center">
+            <p class="text-muted">Crafted with passion by Giovanni Venegas as the final project for Harvard's CS50 course in 2023.</p>
+        </div>
+    </div>
+</div>
+    
+        <script>
+
+
+
+            // Function to validate form input
+            function validateForm() {
+                const wordCountField = document.getElementById("word_count");
+                const numberOfParagraphsField = document.getElementById("number_of_paragraphs");
+        
+                if (wordCountField.value < 0) {
+                    alert("Word Count cannot be negative.");
+                    return false;
+                }
+        
+                if (numberOfParagraphsField.value < 0) {
+                    alert("Number of Paragraphs cannot be negative.");
+                    return false;
+                }
+        
+                return true;
+            }
+        
+            // Function to handle form submission
+            function handleSubmit(e) {
+                e.preventDefault();
+                if (!validateForm()) return;
+        
+                const userRequest = document.getElementById("content_request").value.trim();
+                const wordCount = document.getElementById("word_count").value;
+                const numberOfParagraphs = document.getElementById("number_of_paragraphs").value;
+                const projectType = document.getElementById("project_type").value;
+                const style = document.getElementById("style").value;
+                const topic = document.getElementById("topic").value;
+                const sentiment = document.getElementById("sentiment").value;
+        
+                let basePrompt = `Answer or create`;
+        
+                if (userRequest) {
+                    basePrompt += ` based on the following user request: "${userRequest}" dont print in your response the parameters given to the model, give a straight answer directly to the user request,respond as you are Foxai a AI assistant a expert in all ai generated content here to help you, if the users selct the word count to be as follow then trey to create the response in that word count restriction same as for paragraphs.add a fox emoji at the end of the response `;
+                }
+        
+                if (wordCount) {
+                    basePrompt += ` with a word count of ${wordCount}`;
+                }
+        
+                if (numberOfParagraphs) {
+                    basePrompt += ` and organized into ${numberOfParagraphs} paragraphs`;
+                }
+        
+                if (projectType || style || topic || sentiment) {
+                    basePrompt += "\nNext:\n";
+                    if (projectType) basePrompt += `Project Type: ${projectType}\n`;
+                    if (style) basePrompt += `Style: ${style}\n`;
+                    if (topic) basePrompt += `Topic: ${topic}\n`;
+                    if (sentiment) basePrompt += `Sentiment: ${sentiment}\n`;
+                }
+        
+                const generateButton = document.getElementById("generate-content");
+                generateButton.disabled = true;
+                generateButton.textContent = "Generating content...";
+        
+                fetch("/chatbot", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ content_request: basePrompt })
+                })
+                .then((response) => response.json())
+                .then((data) => {
+                    generateButton.disabled = false;
+                    generateButton.textContent = "Regenerate Content";
+                    const contentBox = document.getElementById("generated-content-textbox");
+                    contentBox.innerHTML = data.error ? "Error: " + data.error : data.generated_content || "No content generated.";
+                    showEditButton();
+                })
+                .catch((error) => {
+                    generateButton.disabled = false;
+                    generateButton.textContent = "Generate Content";
+                    const contentBox = document.getElementById("generated-content-textbox");
+                    contentBox.innerHTML = "An error occurred while generating content.";
+                    console.error(error);
+                });
+            }
+        
+            // Copy, Edit, Save, and Toggle Advanced Options functions
+            function copyText() {
+                const contentBox = document.getElementById("generated-content-textbox");
+                const textToCopy = contentBox.innerText;
+                const tempTextarea = document.createElement("textarea");
+                tempTextarea.value = textToCopy;
+                document.body.appendChild(tempTextarea);
+                tempTextarea.select();
+                document.execCommand("copy");
+                document.body.removeChild(tempTextarea);
+                alert("Text copied to clipboard!");
+            }
+        
+            function editText() {
+                const contentBox = document.getElementById("generated-content-textbox");
+                contentBox.contentEditable = true;
+                contentBox.style.backgroundColor = "#ffffff";
+                contentBox.focus();
+                document.getElementById("copy-content").style.display = "none";
+                document.getElementById("edit-content").style.display = "none";
+                document.getElementById("save-content").style.display = "inline-block";
+            }
+        
+            function saveText() {
+                const contentBox = document.getElementById("generated-content-textbox");
+                contentBox.contentEditable = false;
+                contentBox.style.backgroundColor = "#f8f9fa";
+                contentBox.blur();
+                document.getElementById("copy-content").style.display = "inline-block";
+                document.getElementById("edit-content").style.display = "inline-block";
+                document.getElementById("save-content").style.display = "none";
+            }
+        
+            function toggleAdvancedOptions() {
+                const advancedOptions = document.querySelector(".advanced-options");
+                const toggleButton = document.getElementById("toggle-advanced-options");
+                if (advancedOptions.style.display === "none" || advancedOptions.style.display === "") {
+                    advancedOptions.style.display = "block";
+                    toggleButton.textContent = "Hide Advanced Options";
+                } else {
+                    advancedOptions.style.display = "none";
+                    toggleButton.textContent = "Advanced Options";
+                }
+            }
+        
+            // Event listeners
+            document.getElementById("chat-form").addEventListener("submit", handleSubmit);
+            document.getElementById("copy-content").addEventListener("click", copyText);
+            document.getElementById("edit-content").addEventListener("click", editText);
+            document.getElementById("save-content").addEventListener("click", saveText);
+            document.getElementById("toggle-advanced-options").addEventListener("click", toggleAdvancedOptions);
+        
+            function showEditButton() {
+                document.getElementById("edit-content").style.display = "inline-block";
+            }
+        
+            function showSaveButton() {
+                document.getElementById("save-content").style.display = "inline-block";
+            }
+        </script>
+        </body>
+        </html>
+        {% endblock %}
+        

@@ -1,48 +1,68 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    Portfolio
+    Fox AI - Your Creative AI Companion
 {% endblock %}
 
 {% block main %}
-    <div class="container mt-4">
-        {% if session.user_id %}
-            <h1>Portfolio</h1>
-    <!-- Portfolio table -->
-            <div class="table-responsive">
-                <table class="table table-striped table-hover">
-                    <thead class="thead-dark">
-                        <tr>
-                            <th>Symbol</th> <!-- Table column: Stock Symbol -->
-                            <th>Name</th> <!-- Table column: Stock Name -->
-                            <th>Shares</th> <!-- Table column: Number of Shares -->
-                            <th>Price</th> <!-- Table column: Stock Price -->
-                            <th>Total</th> <!-- Table column: Total Value -->
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for holding in holdings %}
-                            <tr>
-                                <td>{{ holding.symbol }}</td> <!-- Stock Symbol data -->
-                                <td>{{ holding.name }}</td> <!-- Stock Name data -->
-                                <td>{{ holding.shares }}</td> <!-- Number of Shares data -->
-                                <td>{{ holding.price }}</td> <!-- Stock Price data -->
-                                <td>{{ holding.total }}</td> <!-- Total Value data -->
-                            </tr>
-                        {% endfor %}
-                        <tr class="table-primary"> <!-- Highlighted row for cash -->
-                            <td colspan="4">Cash</td> <!-- Table column: Cash -->
-                            <td>{{ cash }}</td> <!-- Cash Value data -->
-                        </tr>
-                    </tbody>
-                </table>
+<!-- Compact Hero Section -->
+<section class="hero-section bg-light text-center py-4">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-lg-7">
+                    <img src="{{ url_for('static', filename='fox.png') }}" alt="Fox AI Logo" class="hero-logo img-fluid mb-2" style="max-width: 250px; transition: transform 0.3s;">
+                </a>
+                <h1 class="display-4 fw-bold text-dark">Discover Fox AI</h1>
+                <p class="text-muted mb-3">AI-Driven Creativity Unleashed</p> Dive into a universe of visual art, AI text generation, and intuitive design.</p>
+                <p class="hero-intro text-secondary mb-3">Join the innovative world of Fox AI, 
             </div>
-        {% else %}
-            <div class="text-center mt-5">
-                <h1>Welcome to Your Portfolio Manager</h1>
-                <p>Please log in to view your portfolio.</p>
-                <a href="{{ url_for('login') }}" class="btn btn-primary mt-3">Log in</a>
-            </div>
-        {% endif %}
+        </div>
     </div>
+</section>
+
+<!-- Streamlined Features Section -->
+<section class="features-section bg-white text-center py-4">
+    <div class="container">
+        <h2 class="section-title text-dark mb-4">Fox AI's Features</h2>
+        <div class="row g-3">
+            <div class="col-md-6 col-lg-3">
+                <a href="buy" class="feature-item p-3" style="display: block; text-decoration: none;">
+                    <img src="{{ url_for('static', filename='fox4.jpg') }}" alt="Visuals" class="feature-img img-fluid mb-2" style="height: 150px; transition: transform 0.3s;">
+                    <h4 class="feature-title mb-1">Visuals</h4>
+                    <p class="feature-desc text-muted">Transform concepts into stunning visuals.</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                <a href="create" class="feature-item p-3" style="display: block; text-decoration: none;">
+                    <img src="{{ url_for('static', filename='6.webp') }}" alt="Text Mastery" class="feature-img img-fluid mb-2" style="height: 150px; transition: transform 0.3s;">
+                    <h4 class="feature-title mb-1">AI Text</h4>
+                    <p class="feature-desc text-muted">Innovate with AI-generated text.</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                
+                    <img src="{{ url_for('static', filename='fox11.webp') }}" alt="Creative Freedom" class="feature-img img-fluid mb-2" style="height: 150px; transition: transform 0.3s;">
+                    <h4 class="feature-title mb-1">Coding</h4>
+                    <p class="feature-desc text-muted">Explore limitless programming possibilities.COMING SOON</p>
+                </a>
+            </div>
+            <div class="col-md-6 col-lg-3">
+                
+                    <img src="{{ url_for('static', filename='8.webp') }}" alt="UI Design" class="feature-img img-fluid mb-2" style="height: 150px; transition: transform 0.3s;">
+                    <h4 class="feature-title mb-1">UI Design</h4>
+                    <p class="feature-desc text-muted">Craft user interfaces with ease.COMING SOON</p>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+
+ <!-- Information about Fox AI Creator -->
+ <div class="row mt-4">
+    <div class="col-md-12 text-center">
+        <p class="text-muted">Crafted with passion by Giovanni Venegas as the final project for Harvard's CS50 course in 2023.</p>
+    </div>
+</div>
+</div>
+</div> <!-- Close the 'main' div properly -->
 {% endblock %}

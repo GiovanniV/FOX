@@ -1,116 +1,252 @@
 {% extends "layout.html" %}
 
 {% block title %}
-    FoxAI Image Generator
+    Fox AI - Unleash Creativity in Web Design with AI-Powered Assets
 {% endblock %}
 
 {% block main %}
 <div class="container">
     <!-- Image Generation Form Section -->
     <div class="row my-4">
+        <!-- Form Column -->
         <div class="col-md-6">
-            <h2>Start Generating Foxai Images</h2>
-            <p>Enter your requirements below to get customized images for your web projects.</p>
+            <h2 class="mb-3">Unlock Your Creativity with FOXAI </h2>
+            <p class="mb-4">Unleash your creativity effortlessly with FOXAI. This remarkable image AI tool is completely free and empowers you to take your visual projects to extraordinary heights.</p>
 
-            <form id="imageForm" action="/generate-image" method="post" class="form-signin" onsubmit="return handleImageGeneration()">
+            <form id="imageForm" action="/generate-image" method="post" class="form-signin" onsubmit="return handleImageGeneration()" enctype="multipart/form-data">
+                <!-- Image Description Field -->
                 <div class="mb-3">
-                    <textarea class="form-control" name="image_description" placeholder="Describe the image you need" rows="3" required></textarea>
+                    <label for="image_description" class="form-label">Image Description:</label>
+                    <textarea class="form-control" name="image_description" id="image_description" placeholder="E.g., A minimalist illustration of a fox in a forest at sunset." rows="3" required></textarea>
+                    <small class="form-text text-muted">
+                        To enhance your image creation, it's essential to describe your desired image in detail. You can mention the subject, setting, mood, and any specific elements you'd like to see. For even more customization, explore the available <a href="#" id="advance-options-toggle">Advance Options</a>.
+                    </small>
                 </div>
-                <!-- Additional fields for image style, dimensions, etc. -->
-                <!-- ... -->
-
-                <!-- Inside the form -->
-                <button class="btn btn-primary mt-2" type="submit" id="generateButton">
+                <!-- Advance Options Section (Initially Hidden) -->
+                <div id="advance-options" style="display: none;">
+                    <!-- Image Style Selection -->
+                    <div class="mb-3">
+                        <label for="image_style" class="form-label">Image Style:</label>
+                        <select class="form-control" name="image_style" id="image_style">
+                            <optgroup label="Realistic Styles">
+                                <option value="Natural Lighting">Natural Lighting</option>
+                                <option value="Studio Lighting">Studio Lighting</option>
+                                <option value="Soft Focus">Soft Focus</option>
+                                <option value="HDR (High Dynamic Range)">HDR (High Dynamic Range)</option>
+                                <option value="Bokeh Effect">Bokeh Effect</option>
+                                <option value="Depth of Field (DOF)">Depth of Field (DOF)</option>
+                                <option value="Macro Photography">Macro Photography</option>
+                                <option value="Telephoto Lens">Telephoto Lens</option>
+                                <option value="Wide-Angle Lens">Wide-Angle Lens</option>
+                                <option value="Prime Lens">Prime Lens</option>
+                                <option value="Fish-eye Lens">Fish-eye Lens</option>
+                                <option value="Tilt-Shift Photography">Tilt-Shift Photography</option>
+                                <option value="Black and White">Black and White</option>
+                                <option value="Sepia Tone">Sepia Tone</option>
+                                <option value="Vintage Film">Vintage Film</option>
+                                <option value="Polaroid">Polaroid</option>
+                                <option value="Cinematic">Cinematic</option>
+                                <option value="Documentary Style">Documentary Style</option>
+                                <option value="Architectural Photography">Architectural Photography</option>
+                                <option value="Photojournalism">Photojournalism</option>
+                                <option value="Wildlife Photography">Wildlife Photography</option>
+                                <option value="Underwater Photography">Underwater Photography</option>
+                                <option value="Aerial Photography">Aerial Photography</option>
+                                <option value="Infrared Photography">Infrared Photography</option>
+                                <option value="Night Photography">Night Photography</option>
+                            </optgroup>
+                            <optgroup label="Artistic Styles">
+                                <option value="Impressionism">Impressionism</option>
+                                <option value="Cubism">Cubism</option>
+                                <option value="Pointillism">Pointillism</option>
+                                <option value="Surrealism">Surrealism</option>
+                                <option value="Abstract Expressionism">Abstract Expressionism</option>
+                                <option value="Pop Art">Pop Art</option>
+                                <option value="Op Art">Op Art</option>
+                                <option value="Futurism">Futurism</option>
+                                <option value="Minimalism">Minimalism</option>
+                                <option value="Realism">Realism</option>
+                                <option value="Hyperrealism">Hyperrealism</option>
+                                <option value="Abstract Realism">Abstract Realism</option>
+                                <option value="Geometric Abstraction">Geometric Abstraction</option>
+                                <option value="Surrealistic Landscape">Surrealistic Landscape</option>
+                                <option value="Symbolism">Symbolism</option>
+                                <option value="Renaissance">Renaissance</option>
+                                <option value="Baroque">Baroque</option>
+                                <option value="Rococo">Rococo</option>
+                                <option value="Pre-Raphaelite">Pre-Raphaelite</option>
+                                <option value="Romanticism">Romanticism</option>
+                                <option value="Abstract Surrealism">Abstract Surrealism</option>
+                                <option value="Photorealistic Painting">Photorealistic Painting</option>
+                                <option value="Neo-Expressionism">Neo-Expressionism</option>
+                            </optgroup>
+                        </select>
+                    </div>
+                    <!-- Context Field -->
+                    <div class="mb-3">
+                        <label for="image_context" class="form-label">Context:</label>
+                        <textarea class="form-control" name="image_context" id="image_context" placeholder="Describe the context or setting for your content request, e.g., 'Write a marketing email for a new product launch" rows="2"></textarea>
+                    </div>
+                    <!-- Color Scheme Field -->
+                    <div class="mb-3">
+                        <label for="image_color" class="form-label">Color Scheme:</label>
+                        <input type="text" class="form-control" name="image_color" id="image_color" placeholder="Preferred colors (e.g., 'blue and white')">
+                    </div>
+                </div>
+                <!-- Generate Button -->
+                <button class="btn btn-dark-orange btn-light-orange-hover mt-3" type="submit" id="generateButton" style="width: 100%;">
                     <span id="generateText">Generate Image</span>
-                    <span id="loadingSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
+                    <span id="generateSpinner" class="spinner-border spinner-border-sm d-none" role="status" aria-hidden="true"></span>
                 </button>
+                <div id="error-message" class="mt-2" style="color: red;"></div>
             </form>
         </div>
 
         <!-- Image Preview Section -->
-        <div class="col-md-6">
+        <div class="col-md-6" id="imagePreviewContainer">
             <div class="text-center">
-                <h2>Image Preview</h2>
-                <!-- Add a link to the generated image with the "lightbox" class -->
-                <a href="#" id="preview-link" data-lightbox="image-preview">
-                    <img id="preview-img" src="#" alt="Image preview" class="img-fluid mb-3">
+                <!-- Static Placeholder Image (initially visible) -->
+                <img id="placeholder-img" src="/static/fox1.webp" alt="Placeholder Image" class="img-fluid mb-3">
+                <!-- Dynamic Image Preview (initially hidden) -->
+                <a href="#" id="preview-link" data-lightbox="image-preview" style="display: none;">
+                    <img id="preview-img" src="#" alt="Generated Image preview" class="img-fluid mb-3">
                 </a>
-                <div class="btn-group">
-                    <button class="btn btn-secondary" onclick="downloadImage()">Download</button>
-                    <button class="btn btn-secondary" onclick="renameImage()">Rename</button>
-                    <button class="btn btn-secondary" onclick="regenerateImage()">Regenerate</button>
-                </div>
+                <!-- Download Button (initially hidden) -->
+                <a href="#" id="download-link" class="btn btn-dark-orange" style="width: 100%; display: none;">Download</a>
+                <!-- JavaScript/jQuery to toggle Advance Options -->
+                <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+                <script>
+                    $(document).ready(function() {
+                        $("#advance-options-toggle").click(function() {
+                            $("#advance-options").toggle();
+                        });
+                    });
+                </script>
+                <!-- Include Lightbox2 CSS and JavaScript files -->
+                <link rel="stylesheet" href="{{ url_for('static', filename='lightbox.min.css') }}">
+                <script src="{{ url_for('static', filename='lightbox.min.js') }}"></script>
+                <!-- JavaScript to set the download attribute -->
+                <script>
+                    document.getElementById('download-link').addEventListener('click', function () {
+                        const downloadLink = document.getElementById('download-link');
+                        const previewImg = document.getElementById('preview-img');
+                        if (previewImg.src) {
+                            const imageUrl = previewImg.src;
+                            const filename = "downloaded_image.png"; // Provide the desired filename with .png extension
+                            downloadLink.setAttribute('download', filename);
+                            downloadLink.href = imageUrl; // Set the href attribute to the image URL
+                        }
+                    });
+                </script>
+                <!-- Initialize Lightbox2 -->
+                <script>
+                    lightbox.option({
+                        'resizeDuration': 200,
+                        'wrapAround': true
+                    });
+                </script>
+                <!-- Define a variable to keep track of the generation status -->
+                <script>
+                    var isGenerating = false;
+
+                    function handleImageGeneration() {
+                        // Check if generation is already in progress
+                        if (isGenerating) {
+                            return false;
+                        }
+
+                        // Set the generation status to true
+                        isGenerating = true;
+
+                        // Get the generate button element
+                        const generateButton = document.getElementById('generateButton');
+
+                        // Show the loading spinner and change button text to "Generating"
+                        generateButton.querySelector('#generateText').innerText = 'Generating...';
+                        generateButton.querySelector('#generateSpinner').classList.remove('d-none');
+
+                        // Clear any previous error messages
+                        document.getElementById('error-message').textContent = '';
+
+                        fetch('/generate-image', {
+                            method: 'POST',
+                            body: new FormData(document.getElementById('imageForm')),
+                        })
+                            .then(response => {
+                                if (response.status === 400) {
+                                    // Content policy violation detected
+                                    return response.json();
+                                }
+                                return response.json();
+                            })
+                            .then(data => {
+                                if (data.image_url) {
+                                    // Show the image preview container
+                                    document.getElementById('imagePreviewContainer').style.display = 'block';
+
+                                    // Hide the static placeholder image
+                                    document.getElementById('placeholder-img').style.display = 'none';
+
+                                    // Show the generated image and hide the placeholder image
+                                    const previewImg = document.getElementById('preview-img');
+                                    const previewLink = document.getElementById('preview-link');
+                                    previewImg.src = data.image_url;
+                                    previewLink.href = data.image_url;
+                                    previewLink.style.display = 'block';
+
+                                    // Show the Download and Edit buttons
+                                    const downloadLink = document.getElementById('download-link');
+                                    const editLink = document.getElementById('edit-link');
+                                    downloadLink.style.display = 'block';
+                                    editLink.style.display = 'block';
+
+                                    // Reset the loading spinner
+                                    generateButton.querySelector('#generateText').innerText = 'Regenerate Image';
+                                    generateButton.querySelector('#generateSpinner').classList.add('d-none');
+
+                                    // Reset the generation status
+                                    isGenerating = false;
+                                } else if (data.error === 'content_policy_violation') {
+                                    // Display content policy violation error message
+                                    document.getElementById('error-message').textContent = 'Your request was rejected as a result of our safety system. Your prompt may contain text that is not allowed by our safety system.';
+
+                                    // Reset the generation status
+                                    isGenerating = false;
+                                } else {
+                                    // Display a generic error message
+                                    document.getElementById('error-message').textContent = 'An error occurred during image generation. Please try again later.';
+
+                                    // Reset the loading spinner
+                                    generateButton.querySelector('#generateText').innerText = 'Generate Image';
+                                    generateButton.querySelector('#generateSpinner').classList.add('d-none');
+
+                                    // Reset the generation status
+                                    isGenerating = false;
+                                }
+                            })
+                            .catch(error => {
+                                console.error('Error during image generation:', error);
+
+                                // Reset the loading spinner
+                                generateButton.querySelector('#generateText').innerText = 'Generate Image';
+                                generateButton.querySelector('#generateSpinner').classList.add('d-none');
+
+                                // Reset the generation status
+                                isGenerating = false;
+                            });
+
+                        return false;
+                    }
+                </script>
             </div>
         </div>
     </div>
-
-    <!-- Existing Buy Form Section -->
-    <div class="row mt-5">
-        <div class="col-md-12">
-            <h4 class="text-left">Stock Purchase (Existing Functionality)</h4>
-            <form action="/buy" method="post" class="form-inline justify-content-center">
-                <div class="form-group mx-2">
-                    <input autocomplete="off" class="form-control" name="symbol" placeholder="Stock Symbol" type="text" required>
-                </div>
-                <div class="form-group mx-2">
-                    <input class="form-control" name="shares" placeholder="Number of Shares" type="number" min="1" required>
-                </div>
-                <button class="btn btn-dark mx-2" type="submit">
-                    Buy
-                </button>
-            </form>
-        </div>
+</div>
+<!-- Information about Fox AI Creator -->
+<div class="row mt-4">
+    <div class="col-md-12 text-center">
+        <p class="text-muted">Crafted with passion by Giovanni Venegas as the final project for Harvard's CS50 course in 2023.</p>
     </div>
 </div>
-
-<!-- Include Lightbox2 JS file -->
-<script src="/static/lightbox.min.js"></script>
-
-<script>
-    // JavaScript functions for image actions
-    function downloadImage() {
-        // Implement image download functionality
-    }
-
-    function renameImage() {
-        // Implement image renaming functionality
-    }
-
-    function handleImageGeneration() {
-        // Show loading spinner
-        document.getElementById('loadingSpinner').classList.remove('d-none');
-        document.getElementById('generateText').innerText = 'Generating...';
-
-        // Fetch the generated image URL from the API response
-        fetch('/generate-image', {
-            method: 'POST',
-            body: new FormData(document.getElementById('imageForm')),
-        })
-        .then(response => response.json())
-        .then(data => {
-            // Update the image preview link and image URL
-            document.getElementById('preview-link').href = data.image_url;
-            document.getElementById('preview-img').src = data.image_url;
-
-            // Hide loading spinner after image is loaded
-            document.getElementById('loadingSpinner').classList.add('d-none');
-            document.getElementById('generateText').innerText = 'Generate Image';
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            
-            // Hide loading spinner in case of an error
-            document.getElementById('loadingSpinner').classList.add('d-none');
-            document.getElementById('generateText').innerText = 'Generate Image';
-        });
-
-        // Prevent the form from submitting
-        return false;
-    }
-
-    function regenerateImage() {
-        // Submit the image generation form
-        document.getElementById('imageForm').submit();
-    }
-</script>
+</div>
 {% endblock %}

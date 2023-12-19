@@ -1,534 +1,432 @@
 import os
 import secrets
-import sqlite3
-import traceback
+from tempfile import mkdtemp  # Added import for mkdtemp
 import logging
-from flask import Flask, flash, redirect, render_template, request, session, jsonify, current_app as app
+import openai
+from flask import Flask, request, redirect, url_for, render_template, session, flash
+from werkzeug.utils import secure_filename
+from flask import Flask, flash, redirect, render_template, request, session, jsonify, url_for, send_from_directory
+from werkzeug.security import check_password_hash, generate_password_hash 
 from flask_session import Session
-from tempfile import mkdtemp
-from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import apology, login_required, lookup, usd, generate_image
-from flask import render_template, jsonify
+from werkzeug.utils import secure_filename
+from helpers import login_required, get_openai_api_key, get_db_connection
+from flask import Flask, request, send_file
+import psycopg2
+from history import download_image
+import re
+from history import user_images
+import json
+  
 
-# Configure application
+# Create the app instance
 app = Flask(__name__)
 
-# Ensure templates are auto-reloaded
-app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-# Configure session to use filesystem (instead of signed cookies)
+# Configure application
+app.config["TEMPLATES_AUTO_RELOAD"] = True
 app.config["SESSION_PERMANENT"] = False
 app.config["SESSION_TYPE"] = "filesystem"
 app.config["SESSION_FILE_DIR"] = mkdtemp()
 Session(app)
+app.secret_key = os.environ.get("SECRET_KEY", secrets.token_urlsafe(16))
 
-# Function to get a database connection
-def get_db_connection():
-    conn = sqlite3.connect('finance.db')
-    conn.row_factory = sqlite3.Row  # This allows you to access columns by name
-    return conn
+# Configure logging
+logging.basicConfig(level=logging.DEBUG)
 
-# Example usage of the connection to get table names
-conn = get_db_connection()
-cursor = conn.cursor()
-cursor.execute("SELECT name FROM sqlite_master WHERE type='table';")
-rows = cursor.fetchall()
 
-# Print all table names
-for row in rows:
-    print(row['name'])
+# Set the OpenAI API key using the function
+api_key = get_openai_api_key()
 
-cursor.close()
-conn.close()
+if api_key:
+    openai.api_key = api_key
+else:
+    # Handle the case where the API key retrieval fails
+    print("API key not found or retrieval failed.")
 
-# Ensure responses aren't cached
+# Register the user_images Blueprint
+app.register_blueprint(user_images)
+
 @app.after_request
 def after_request(response):
-    response.headers[
-        "Cache-Control"
-    ] = "no-cache, no-store, must-revalidate, post-check=0, pre-check=0"
+    response.headers["Cache-Control"] = "no-cache, no-store, must-revalidate, post-check=0, pre-check=0"
     response.headers["Expires"] = 0
     response.headers["Pragma"] = "no-cache"
     return response
 
-# Custom filter
-app.jinja_env.filters["usd"] = usd
-
-
+@app.template_filter('usd')
+def usd_filter(value):
+    # Implement currency formatting logic here
+    # Example: return f"${value:.2f}"
+    pass
 
 @app.route("/")
 @login_required
 def index():
-    """Show portfolio of stocks and transaction history"""
-    user_id = session["user_id"]
-
-    # Open a database connection
-    conn = get_db_connection()
-    cursor = conn.cursor()
-
-    # Retrieve the user's portfolio of stocks
-    cursor.execute("SELECT symbol, SUM(shares) as total_shares FROM transactions WHERE user_id = ? GROUP BY symbol HAVING total_shares > 0", (user_id,))
-    portfolio = cursor.fetchall()
-
-    # Prepare variables to hold the portfolio data and the grand total value
-    holdings = []
-    grand_total = 0
-
-    # For each stock in the portfolio, look up the current price and calculate the total value
-    for stock in portfolio:
-        stock_info = lookup(stock["symbol"])
-        if stock_info:
-            total_value = stock_info["price"] * stock["total_shares"]
-            holdings.append(
-                {
-                    "symbol": stock_info["symbol"],
-                    "name": stock_info["name"],
-                    "shares": stock["total_shares"],
-                    "price": usd(stock_info["price"]),
-                    "total": usd(total_value),
-                }
-            )
-            grand_total += total_value
-        else:
-            # Handle the case where stock_info is None
-            flash(f"Stock information for {stock['symbol']} could not be retrieved.", "warning")
-
-    # Fetch transaction history for the user
-    cursor.execute("SELECT symbol, shares, price, transacted FROM transactions WHERE user_id = ? ORDER BY transacted DESC", (user_id,))
-    transactions = cursor.fetchall()
-
-    # Modify transactions to include formatted price
-    formatted_transactions = []
-    for transaction in transactions:
-        formatted_transaction = dict(transaction)
-        formatted_transaction["price"] = usd(formatted_transaction["price"])
-        formatted_transactions.append(formatted_transaction)
-
-    # Get the current cash balance of the user
-    cursor.execute("SELECT cash FROM users WHERE id = ?", (user_id,))
-    cash = cursor.fetchone()["cash"]
-    grand_total += cash
-
-    # Close the cursor and connection
-    cursor.close()
-    conn.close()
-
-    # Render the index page with the user's portfolio data, cash, grand total value, and transactions
-    return render_template(
-        "index.html",
-        holdings=holdings,
-        cash=usd(cash),
-        grand_total=usd(grand_total),
-        transactions=formatted_transactions,
-    )
-
-
-
-
-from flask import flash, redirect, render_template, request, session
-from functools import wraps
-import re  # Import regular expressions
-
-import traceback
-
-
+    return render_template("index.html")
 
 @app.route("/buy", methods=["GET", "POST"])
 @login_required
 def buy():
-    if request.method == "POST":
-        symbol = request.form.get("symbol", "").upper()
-        if not symbol or not re.match("^[A-Z.]{1,5}$", symbol):
-            flash("Invalid or missing stock symbol.", "danger")
-            return render_template("buy.html"), 400
+    return render_template("buy.html")
 
-        try:
-            shares = int(request.form.get("shares"))
-            if shares <= 0:
-                raise ValueError
-        except ValueError:
-            flash("Shares must be a positive integer.", "danger")
-            return render_template("buy.html"), 400
-
-        stock = lookup(symbol)
-        if stock is None:
-            flash("Symbol not found.", "danger")
-            return render_template("buy.html"), 400
-
-        # Start SQLite transaction
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        try:
-            # Check user's cash
-            cursor.execute("SELECT cash FROM users WHERE id = ?", (session["user_id"],))
-            user_cash = cursor.fetchone()["cash"]
-            cost = stock["price"] * shares
-
-            if cost > user_cash:
-                flash("Not enough cash to complete the purchase.", "danger")
-                return render_template("buy.html"), 400
-
-            # Update user's cash
-            cursor.execute("UPDATE users SET cash = cash - ? WHERE id = ?", (cost, session["user_id"]))
-
-            # Record the transaction
-            cursor.execute("INSERT INTO transactions (user_id, symbol, shares, price) VALUES (?, ?, ?, ?)", (session["user_id"], symbol, shares, stock["price"]))
-
-            # Commit transaction
-            conn.commit()
-
-        except Exception as e:
-            # Rollback in case of error
-            conn.rollback()
-            print(f"Error processing purchase: {e}")
-            flash("An error occurred while processing your purchase.", "danger")
-            return render_template("buy.html"), 500
-        finally:
-            cursor.close()
-            conn.close()
-
-        flash("Purchase successful!", "success")
-        return redirect(url_for("index"))
-    else:
-        return render_template("buy.html")
-
-from flask import jsonify  # Import jsonify for JSON responses
-
-@app.route("/generate-image", methods=["POST"])
+@app.route('/generate-image', methods=['POST'])
 @login_required
 def generate_image_route():
     try:
-        # Extract data from form
+        user_id = session.get("user_id")
         description = request.form.get("image_description")
+        image_style = request.form.get("image_style")
+        context = request.form.get("image_context", "").strip()
+        mood = request.form.get("image_mood", "").strip()
+        color_scheme = request.form.get("image_color", "").strip()
+        image_dimensions = request.form.get("image_dimensions", "1024x1024")
 
-        # Call the generate_image function
-        image_url = generate_image(description)
+        optional_params = {
+            "image_format": request.form.get("image_format"),
+            "image_quality": request.form.get("image_quality")
+        }
 
-        if image_url:
-            # Return the image URL in a JSON response
-            return jsonify({"image_url": image_url})
-        else:
-            # Handle the error case
-            app.logger.error("Error generating image")
-            return jsonify({"error": "Error generating image"}), 500
-    except Exception as e:
-        app.logger.error(f"An unexpected error occurred: {e}")
-        traceback.print_exc()  # Print the traceback for debugging
-        return jsonify({"error": "An unexpected error occurred"}), 500
+        if not description or not image_style:
+            return jsonify({"error": "Missing required arguments"}), 400
 
-@app.route("/add_cash", methods=["GET", "POST"])
-@login_required
-def add_cash():
-    """Add cash to account"""
-    if request.method == "POST":
-        # Ensure that amount is a positive number
-        try:
-            amount = float(request.form.get("amount"))
-            if amount <= 0:
-                raise ValueError("Amount must be positive")
-        except ValueError as e:
-            # If there is a ValueError, return an apology with the error message
-            return apology(str(e), 400)
+        api_key = get_openai_api_key()
+        if not api_key:
+            logging.error("Failed to retrieve OpenAI API key")
+            return jsonify({"error": "Failed to retrieve OpenAI API key"}), 500
 
-        # Open a database connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
+        # Constructing the prompt
+        prompt = f"Generate a {image_style} image"
+        if description:
+         prompt += f". Description: {description}"
+        if context:
+         prompt += f", set in {context}"
+        if image_dimensions:
+         prompt += f" of {image_dimensions} pixels in size"
+        if color_scheme:
+         prompt += f", with a color scheme of {color_scheme}"
 
-        try:
-            # Perform the update on the user's cash balance
-            cursor.execute("UPDATE users SET cash = cash + ? WHERE id = ?", (amount, session["user_id"]))
+        logging.debug(f"OpenAI Prompt: {prompt}")
+
+        # Dynamically setting the size parameter
+        supported_sizes = ["1024x1024", "1024x1792", "1792x1024"]
+        size_param = image_dimensions if image_dimensions in supported_sizes else "1024x1024"
+
+        response = openai.Image.create(prompt=prompt, n=1, size=size_param)
+        logging.debug(f"OpenAI API Response: {response}")
+
+        # Processing the response
+        if response and 'data' in response and response['data']:
+            image_url = response['data'][0].get('url')
+            # Store image information in the database
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO images (user_id, description, style, dimensions, format, quality, image_url) VALUES (%s, %s, %s, %s, %s, %s, %s)",
+                (user_id, description, image_style, image_dimensions, optional_params.get('image_format'), optional_params.get('image_quality'), image_url)
+            )
             conn.commit()
-
-            # Verify that the database update affected exactly one row
-            if cursor.rowcount < 1:
-                return apology("Unable to add cash to account", 400)
-
-            # If the update was successful, notify the user
-            flash(f"${amount:.2f} added to your account!")
-            return redirect("/")
-
-        except Exception as e:
-            conn.rollback()
-            return apology(f"An error occurred: {e}", 500)
-        finally:
             cursor.close()
             conn.close()
-    else:
-        # If method is GET, render the add_cash form
-        return render_template("add_cash.html")
+
+            # Return JSON response with the image URL
+            return jsonify({"image_url": image_url}), 200
+        else:
+            logging.error("No image data found in response or error occurred")
+            return jsonify({"error": "An error occurred during image generation. Please try again later."}), 500
+
+    except Exception as e:
+        logging.error(f"An unexpected error occurred: {e}")
+        return jsonify({"error": "An unexpected error occurred. Please try again later."}), 500
 
 
 
-@app.route("/history")
+# New route to fetch image styles
+@app.route('/api/image-styles', methods=['GET'])
+def fetch_image_styles():
+    image_styles = ["Style1", "Style2", "Style3"]  # Modify this list with actual styles
+    return jsonify(image_styles)
+
+# Route to serve images by filename
+@app.route('/serve-image/<filename>')
+def serve_image(filename):
+    try:
+        # Connect to the database
+        connection = get_db_connection()
+
+        # Query the database to fetch image data by filename
+        cursor = connection.cursor()
+        cursor.execute("SELECT image_data FROM images WHERE filename = %s", (filename,))
+        image_data = cursor.fetchone()
+
+        if image_data:
+            # Serve the image data as a response
+            return send_file(
+                image_data[0],
+                mimetype='image/jpeg'  # Adjust the mimetype based on your image format
+            )
+        else:
+            return "Image not found", 404
+    except Exception as e:
+        return str(e), 500
+    finally:
+        cursor.close()
+        connection.close()
+
+
+# Route for the account page
+@app.route('/account', methods=['GET'])
 @login_required
-def history():
-    """Show history of transactions"""
-    user_id = session["user_id"]
+def account():
+    user_id = session.get("user_id")
+    if not user_id:
+        return redirect(url_for("login"))
 
-    # Initialize an empty list to hold transaction histories
-    histories = []
-
-    # Open a database connection
     conn = get_db_connection()
     cursor = conn.cursor()
 
+    # Retrieve user data from the database
+    cursor.execute("SELECT id, username, email FROM users WHERE id = %s", (user_id,))
+    user_data = cursor.fetchone()
+
+    cursor.close()
+    conn.close()
+
+    if not user_data:
+        flash("User not found", "danger")
+        return redirect(url_for("login"))
+
+    user = {
+        "id": user_data[0],
+        "username": user_data[1],
+        "email": user_data[2],
+    }
+    return render_template('account.html', user=user)
+
+
+@app.route('/images')
+@login_required  # Ensure the user is logged in
+def display_images():
+    # Fetch user-specific images from the database
+    user_id = session["user_id"]
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT * FROM images WHERE user_id = %s", (user_id,))
+    user_images = cursor.fetchall()
+    cursor.close()
+    conn.close()
+    return render_template('images.html', images=user_images)
+
+@app.route("/create")
+@login_required  # If you want this page to be accessible only after logging in
+def create():
+    return render_template("create.html")
+
+# Function to interact with the chatbot
+def get_chatbot_response(user_input):
+    api_key = get_openai_api_key()
+    openai.api_key = api_key
+    response = openai.ChatCompletion.create(
+        model="gpt-3.5-turbo",  # Replace with your preferred model
+        messages=[{"role": "user", "content": user_input}]
+    )
+    return response.choices[0].message.content
+
+# Route to handle chatbot requests
+@app.route('/chatbot', methods=['POST'])
+@login_required
+def chatbot():
     try:
-        # Fetch transaction history for the user
-        cursor.execute("SELECT id, symbol, shares, price, transacted FROM transactions WHERE user_id = ? ORDER BY transacted DESC", (user_id,))
-        transactions = cursor.fetchall()
+        data = request.get_json()
+        user_input = data.get('content_request')  # Ensure this key matches the JavaScript request
+        if not user_input:
+            return jsonify({"error": "No input provided"}), 400
 
-        # Check if transactions were found
-        if not transactions:
-            flash("No transaction history found.")  # Flash a message to the user
-
-        # Format transaction data
-        for transaction in transactions:
-            transaction_data = dict(transaction)
-            transaction_data["price_formatted"] = usd(transaction_data["price"])
-            transaction_data["total"] = transaction_data["shares"] * transaction_data["price"]
-            transaction_data["total_formatted"] = usd(transaction_data["total"])
-            transaction_data["transaction_date"] = transaction_data["transacted"]
-            histories.append(transaction_data)
-
-        # Return the history page with the transactions
-        return render_template("history.html", transactions=histories)
-
+        chatbot_response = get_chatbot_response(user_input)
+        return jsonify({"generated_content": chatbot_response})  # Key to match with JavaScript fetch
     except Exception as e:
-        print(f"An error occurred: {e}")  # This will print the exception to your console or logs
-        flash("An error occurred while loading transaction history.")  # Flash a message to the user
-        return redirect(url_for("index"))  # Redirect to index page or an error page if you prefer
-    finally:
-        cursor.close()
-        conn.close()
+        return jsonify({"error": str(e)}), 500
+
+# Helper function to validate email
+def is_email_valid(email):
+    """Check if the email is in a valid format."""
+    return re.match(r"[^@]+@[^@]+\.[^@]+", email)
+
+# Helper function to validate password strength
+def is_password_strong(password):
+    """Check if the password is strong."""
+    if len(password) < 8:
+        return False
+    if not re.search("[a-z]", password):
+        return False
+    if not re.search("[A-Z]", password):
+        return False
+    if not re.search("[0-9]", password):
+        return False
+    if not re.search("[_@$]", password):
+        return False
+    return True
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
-    # Forget any user_id
     session.clear()
-
     if request.method == "POST":
-        # User reached route via POST (as by submitting a form via POST)
         username = request.form.get("username")
         password = request.form.get("password")
 
-        # Ensure username was submitted
-        if not username:
-            flash("Must provide username", "danger")
+        if not username or not password:
+            flash("Username and password are required", "danger")
             return render_template("login.html")
 
-        # Ensure password was submitted
-        elif not password:
-            flash("Must provide password", "danger")
-            return render_template("login.html")
-
-        # Open a database connection
         conn = get_db_connection()
         cursor = conn.cursor()
+        cursor.execute("SELECT id, password_hash FROM users WHERE username = %s", (username,))
+        user = cursor.fetchone()
+        cursor.close()
+        conn.close()
 
-        try:
-            # Query database for username
-            cursor.execute("SELECT * FROM users WHERE username = ?", (username,))
-            rows = cursor.fetchall()
-
-            # Ensure username exists and password is correct
-            if len(rows) != 1 or not check_password_hash(rows[0]["hash"], password):
-                flash("Invalid username and/or password", "danger")
-                return render_template("login.html")
-
-            # Remember which user has logged in
-            session["user_id"] = rows[0]["id"]
-
-            # Redirect user to home page
-            return redirect("/")
-        finally:
-            cursor.close()
-            conn.close()
+        if user and check_password_hash(user[1], password):
+            session["user_id"] = user[0]
+            return redirect(url_for("index"))
+        else:
+            flash("Invalid username and/or password", "danger")
+            return render_template("login.html")
     else:
-        # User reached route via GET
         return render_template("login.html")
-
-
 
 @app.route("/logout")
 def logout():
-    # ... (implementation of the logout route as you provided)
     session.clear()
-    return redirect("/")
-
-
-from flask import render_template, request, flash, redirect, url_for
-from helpers import lookup, usd, login_required
-
-
-@app.route("/quote", methods=["GET", "POST"])
-@login_required
-def get_quote():
-    if request.method == "POST":
-        # Get the symbol from the form
-        symbol = request.form.get("symbol").upper()
-
-        # Check if the symbol is blank
-        if not symbol:
-            flash("Must provide a symbol", "error")
-            return render_template("quote.html"), 400
-
-        # Look up the current price of the stock
-        stock = lookup(symbol)
-
-        # Check if the symbol is invalid (stock is None)
-        if stock is None:
-            flash("Invalid symbol", "error")
-            return render_template("quote.html"), 400
-
-        # Display the stock price per share
-        return render_template("quoted.html", stock=stock)
-    else:
-        # If method is GET, display the form to get a new quote
-        return render_template("quote.html")
-
+    return redirect(url_for("login"))
 
 @app.route("/register", methods=["GET", "POST"])
 def register():
     if request.method == "POST":
+        first_name = request.form.get("first_name")
+        last_name = request.form.get("last_name")
+        email = request.form.get("email")
         username = request.form.get("username")
         password = request.form.get("password")
         confirmation = request.form.get("confirmation")
 
-        if not username:
-            return apology("must provide username", 400)
-
-        if not password:
-            return apology("must provide password", 400)
+        if not all([first_name, last_name, email, username, password, confirmation]):
+            flash("All fields are required", "danger")
+            return render_template("register.html")
 
         if password != confirmation:
-            return apology("passwords do not match", 400)
+            flash("Passwords do not match", "danger")
+            return render_template("register.html")
+
+        if not is_email_valid(email):
+            flash("Invalid email address", "danger")
+            return render_template("register.html")
+
+        if not is_password_strong(password):
+            flash("Password is not strong enough", "danger")
+            return render_template("register.html")
 
         hash_pw = generate_password_hash(password)
 
-        # Open a database connection
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
         try:
-            # Insert the new user into the database
-            cursor.execute("INSERT INTO users (username, hash) VALUES (?, ?)", (username, hash_pw))
+            conn = get_db_connection()
+            cursor = conn.cursor()
+            cursor.execute(
+                "INSERT INTO users (first_name, last_name, email, username, password_hash) VALUES (%s, %s, %s, %s, %s)",
+                (first_name, last_name, email, username, hash_pw)
+            )
             conn.commit()
-
-            # Retrieve the new user's id
-            cursor.execute("SELECT id FROM users WHERE username = ?", (username,))
-            new_user_id = cursor.fetchone()["id"]
-            session["user_id"] = new_user_id
-
-            flash("Registered!")
-            return redirect("/")
-        except sqlite3.IntegrityError:
-            return apology("username already taken", 400)
-        finally:
             cursor.close()
             conn.close()
+
+            flash("Registered successfully!", "success")
+            return redirect(url_for("login"))
+        except psycopg2.IntegrityError:
+            flash("Username already taken", "danger")
+            return render_template("register.html")
+        except Exception as e:
+            flash(f"An error occurred: {e}", "danger")
+            return render_template("register.html")
     else:
         return render_template("register.html")
-
-
-@app.route("/sell", methods=["GET", "POST"])
-@login_required
-def sell():
-    """Sell shares of stock"""
-    user_id = session["user_id"]
-
-    if request.method == "POST":
-        # Ensure symbol was submitted
-        symbol = request.form.get("symbol")
-        if not symbol:
-            return apology("must provide symbol", 400)
-
-        # Convert symbol to uppercase to maintain consistency
-        symbol = symbol.upper()
-
-        # Ensure number of shares was submitted and is a positive integer
-        try:
-            shares_to_sell = int(request.form.get("shares"))
-            if shares_to_sell <= 0:
-                raise ValueError("Shares must be a positive integer")
-        except ValueError:
-            return apology("Shares must be a positive integer", 400)
+        
+@app.route('/change_password', methods=['GET', 'POST'])
+def change_password():
+    if request.method == 'POST':
+        current_password = request.form['current_password']
+        new_password = request.form['new_password']
+        confirm_password = request.form['confirm_password']
+        
+        user_id = session.get("user_id")
+        
+        if not user_id:
+            return redirect(url_for("login"))
 
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        try:
-            # Query database for the user's shares of that stock
-            cursor.execute("SELECT SUM(shares) as total_shares FROM transactions WHERE user_id = ? AND symbol = ? GROUP BY symbol", (user_id, symbol))
-            user_shares_result = cursor.fetchone()
-            user_shares = user_shares_result['total_shares'] if user_shares_result else 0
+        cursor.execute("SELECT password_hash FROM users WHERE id = %s", (user_id,))
+        result = cursor.fetchone()
 
-            if user_shares < shares_to_sell:
-                return apology("not enough shares", 400)
+        if result and check_password_hash(result[0], current_password):
+            if new_password == confirm_password:
+                # Update the user's password
+                hashed_password = generate_password_hash(new_password)
+                cursor.execute("UPDATE users SET password_hash = %s WHERE id = %s",
+                               (hashed_password, user_id))
+                conn.commit()
 
-            # Get current stock price
-            stock = lookup(symbol)
-            if stock is None:
-                return apology("Invalid Symbol", 400)
-
-            # Calculate the revenue from selling the shares
-            revenue = shares_to_sell * stock["price"]
-
-            # Update the user's cash by adding the revenue from selling the shares
-            cursor.execute("UPDATE users SET cash = cash + ? WHERE id = ?", (revenue, user_id))
-
-            # Insert the transaction (as a negative number of shares)
-            cursor.execute("INSERT INTO transactions (user_id, symbol, shares, price) VALUES (?, ?, ?, ?)", (user_id, symbol, -shares_to_sell, stock["price"]))
-
-            # Commit the transaction
-            conn.commit()
-
-        except sqlite3.Error as e:
-            conn.rollback()
-            return apology(f"Transaction failed: {e}", 400)
-        finally:
-            cursor.close()
-            conn.close()
-
-        # Notify the user of a successful sale
-        flash(f"Sold {shares_to_sell} shares of {symbol}")
-        return redirect("/")
-    else:
-        # User reached the route via GET
-        conn = get_db_connection()
-        cursor = conn.cursor()
-
-        cursor.execute("SELECT symbol FROM transactions WHERE user_id = ? GROUP BY symbol HAVING SUM(shares) > 0", (user_id,))
-        symbols = cursor.fetchall()
+                # Flash a success message
+                flash('Password changed successfully.', 'success')
+                
+                # Log out the user after changing the password
+                session.pop('user_id', None)
+                session.pop('password', None)
+                
+                cursor.close()
+                conn.close()
+                
+                return redirect(url_for('login'))
+            else:
+                flash('New password and confirm password do not match.', 'danger')
+        else:
+            flash('Current password is incorrect.', 'danger')
 
         cursor.close()
         conn.close()
 
-        return render_template("sell.html", symbols=[stock["symbol"] for stock in symbols])
+    # Retrieve user data from the database (you can reuse the account route's code)
+    user = get_user_data(user_id)
+    
+    return render_template('account.html', user=user)
 
+# Helper function to retrieve user data from the database
+def get_user_data(user_id):
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute("SELECT id, username, email, profile_image FROM users WHERE id = %s", (user_id,))
+    user_data = cursor.fetchone()
+    cursor.close()
+    conn.close()
 
+    if not user_data:
+        flash("User not found", "danger")
+        return None
 
-
-
-# Only if your app runs with app.run(), not typically used in production
-if __name__ == "__main__":
-    app.run()
-
+    return {
+        "id": user_data[0],
+        "username": user_data[1],
+        "email": user_data[2],
+        "profile_image": user_data[3],
+    }
 
 # Error handlers
 @app.errorhandler(404)
 def not_found_error(error):
     return render_template("404.html"), 404
 
-
 @app.errorhandler(500)
 def internal_error(error):
     return render_template("500.html"), 500
-
-
-# Make sure to use a secure and unique secret key in production
-app.secret_key = os.environ.get("SECRET_KEY", secrets.token_urlsafe(16))
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, debug=True)
